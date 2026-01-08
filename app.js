@@ -10,7 +10,7 @@ const session = require('express-session');
 const AUTH_URL = process.env.AUTH_URL || 'localhost:4000/auth';
 const THIS_URL = process.env.THIS_URL || 'http://localhost:3000/login';
 const isAuthenticated = require('./middleware/isAuthenticated');
-const db = new sqlite3.Database('./data.db', (error) => {
+const db = new sqlite3.Database('./database/data.db', (error) => {
     if (error) {
         console.log(error);
     } else {
@@ -32,3 +32,15 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+// Routes
+const indexRouter = require('./routes/index');
+const loginRouter = require('./routes/login');
+app.use('/', indexRouter);
+app.use('/', loginRouter);
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
+
+module.exports = app;

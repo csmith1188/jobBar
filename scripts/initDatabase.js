@@ -9,16 +9,16 @@ if (!fs.existsSync(dataFolderPath)) {
 }
 
 // Correct paths
-const dbPath = path.resolve(dataFolderPath, 'database.db'); // Ensure database.db is in the data folder
+const dbPath = path.resolve(dataFolderPath, 'database.sqlite'); // Ensure database.sqlite is in the data folder
 const initSqlPath = path.resolve(dataFolderPath, 'database.sql'); // Ensure database.sql is in the data folder
 
 // Create the database.sql file with the necessary SQL commands
 const sqlCommands = `
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT,
-    fb_id TEXT UNIQUE
-);`;
+    fb_id TEXT UNIQUE,
+    username TEXT
+);`
 
 fs.writeFileSync(initSqlPath, sqlCommands.trim(), 'utf8');
 
@@ -31,7 +31,6 @@ async function initializeDatabase() {
         const db = new sqlite3.Database(dbPath, (err) => {
             if (err) {
                 console.error(`Failed to connect to database: ${err.message}`);
-                db.close();
                 return reject(err);
             }
             console.log('Connected to the SQLite database.');
@@ -39,12 +38,11 @@ async function initializeDatabase() {
             // If the database file does not exist, initialize it
             if (!dbExists) {
                 // Create an empty database file
-                // fs.writeFileSync(dbPath, '');
+                fs.writeFileSync(dbPath, '');
 
                 fs.readFile(initSqlPath, 'utf8', (err, data) => {
                     if (err) {
                         console.error(`Failed to read database.sql: ${err.message}`);
-                        db.close();
                         return reject(err);
                     }
                 
@@ -54,13 +52,15 @@ async function initializeDatabase() {
                     db.exec(data, (err) => {
                         if (err) {
                             console.error(`Failed to initialize database schema: ${err.message}`);
-                            db.close();
+                            console.error('SQL execution error:', err.message); // Log the error to the console
                             return reject(new Error(`Database initialization failed: ${err.message}`));
                         }
+                        console.log('Database schema initialized successfully.');
                         resolve(db);
                     });
                 });
             } else {
+                console.log('Database already exists. Skipping initialization.');
                 resolve(db);
             }
         });

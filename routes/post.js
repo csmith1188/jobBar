@@ -14,16 +14,17 @@ router.get('/post', isAuthenticated, (req, res) => {
 });
 
 router.post('/post', isAuthenticated, (req, res) => {
-    const { name, description, url } = req.body;
-    if (!name || !description || !url) {
+    const body = req.body || {};
+    const { name, description, link } = body;
+    if (!name || !description || !link) {
         return res.status(400).send('All fields are required.');
     }
-    db.run('INSERT INTO companies (name, description, url) VALUES (?, ?, ?)', [name, description, url], function(err) {
+    db.run('INSERT INTO companies (name, description, link) VALUES (?, ?, ?)', [name, description, link], function(err) {
         if (err) {
             console.error('Database error:', err);
             return res.status(500).send('Internal Server Error');
         }
-        res.redirect('/freelance');
+        res.redirect('/');
     });
 });
 module.exports = router;

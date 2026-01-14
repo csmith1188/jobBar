@@ -25,8 +25,10 @@ app.locals.db = db;
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Middleware to parse JSON bodies
+// Middleware to parse request bodies
 app.use(express.json());
+// Parse URL-encoded bodies (HTML form submissions)
+app.use(express.urlencoded({ extended: true }));
 
 
 // Serve static files from the 'public' directory
@@ -43,10 +45,12 @@ const indexRouter = require('./routes/index');
 const loginRouter = require('./routes/login');
 const freeRouter = require('./routes/freelance');
 const linksRouter = require('./routes/links');
+const postRouter = require('./routes/post');
 app.use('/', indexRouter);
 app.use('/', loginRouter);
 app.use('/', freeRouter);
 app.use('/', linksRouter);
+app.use('/', postRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

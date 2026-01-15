@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const session = require('express-session');
 const AUTH_URL = process.env.AUTH_URL || 'localhost:4000/auth';
 const THIS_URL = process.env.THIS_URL || 'http://localhost:3000/login';
-const isAuthenticated = require('./middleware/isAuthenticated');
+
 const db = new sqlite3.Database('./database/database.sqlite', (err) => {
     if (err) {
         console.error('Could not connect to database', err);

@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS jobs (
     company TEXT,
     title TEXT,
     description TEXT,
-    employee_id INTEGER
+    employee_id INTEGER,
+    pay INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS companies (

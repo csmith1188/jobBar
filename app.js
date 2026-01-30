@@ -24,13 +24,13 @@ app.locals.db = db;
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Middleware to parse request bodies
+// Middleware
 app.use(express.json());
-// Parse URL-encoded bodies (HTML form submissions)
 app.use(express.urlencoded({ extended: true }));
-
-// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+
 
 app.use(session({
     secret: process.env.SECRET,

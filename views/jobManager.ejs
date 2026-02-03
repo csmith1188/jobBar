@@ -9,7 +9,11 @@
   </title>
   <link rel="stylesheet" href="/css/index.css">
   <link rel="stylesheet" href="/css/job.css">
-  <script src="/js/jobManager.js"></script>
+  <script>
+    // expose fb_id to client-side scripts
+    window.fb_id = <%= JSON.stringify(fb_id || '') %>;
+  </script>
+  <script defer src="/js/jobManager.js"></script>
 
 </head>
 

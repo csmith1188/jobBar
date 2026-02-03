@@ -4,6 +4,7 @@ const isAuthenticated = require('../middleware/isAuthenticated');
 
 // Route: show a single company and its jobs by company name (same EJS page)
 router.get('/jobManager/:companyName', isAuthenticated, (req, res) => {
+
     const db = req.app.locals.db;
     const companyName = req.params.companyName; // express already decodes URL components
 
@@ -35,6 +36,18 @@ router.get('/jobManager/:companyName', isAuthenticated, (req, res) => {
 
             // find the selected company object by name (case-insensitive)
             const selectedCompany = companies.find(c => String(c.name).toLowerCase() === String(companyName).toLowerCase()) || null;
+
+            if (!selectedCompany) {
+                return res.status(404).send('Company not found');
+            }
+
+            // enforce owner-only access to the job manager page
+            const requesterFb = req.session && req.session.fb_id ? String(req.session.fb_id) : null;
+            const ownerFb = selectedCompany.owner_id !== undefined && selectedCompany.owner_id !== null ? String(selectedCompany.owner_id) : null;
+            if (requesterFb !== ownerFb) {
+                res.redirect('/companies');
+                return 
+            }
 
             // render job view — the template expects `company` (singular), so pass that
             // pass current session user info so template can show apply buttons

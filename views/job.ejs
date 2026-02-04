@@ -6,16 +6,25 @@
     <title><%= company ? company.name : 'Company' %> — Jobs</title>
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/job.css">
-    
+    <script defer src="/js/job.js">
+    </script>
 </head>
 <body>
   <main class="jobs-container">
+    <% 
+      // compute owner-based permissions and precompute URLs server-side
+      const ownerId = company && (company.owner_id !== undefined && company.owner_id !== null) ? String(company.owner_id) : null;
+      const requesterId = typeof fb_id !== 'undefined' && fb_id !== null ? String(fb_id) : null;
+      const canManage = requesterId && ownerId && requesterId === ownerId;
+      const jobPostsUrl = company ? ('/jobPosts/' + encodeURIComponent(company.name)) : '/jobPosts/Not%20found';
+      const jobManagerUrl = company ? ('/jobManager/' + encodeURIComponent(company.name)) : '/jobManager/Not%20found';
+    %>
     <div class="nav-row">
       <button class="small-btn" onclick="location.href='/companies'">All companies</button>
       <button class="small-btn" onclick="location.href='/'">Home</button>
-      <% if (isManager) { %>
-         <a class="small-btn" href="/jobPosts/<%= company ? encodeURIComponent(company.name) : 'Not%20found' %>">Post a Job</a>
-      <button class="small-btn" onclick="location.href='/jobManager/<%= company ? encodeURIComponent(company.name) : 'Not%20found' %>'">Manage Jobs</button>
+      <% if (canManage) { %>
+        <a class="small-btn" href="<%= jobPostsUrl %>">Post a Job</a>
+        <button class="small-btn" onclick="location.href='<%= jobManagerUrl %>'">Manage Jobs</button>
       <% } %>
     </div>
 

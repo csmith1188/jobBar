@@ -37,21 +37,24 @@
 
     <section aria-labelledby="jobs-list">
       <h2 id="jobs-list">Open positions</h2>
-      <% if (!jobs || jobs.length === 0) { %>
-        <p>No jobs posted for this company yet.</p>
+      <% 
+        // Filter for available jobs (no employee assigned)
+        const availableJobs = jobs ? jobs.filter(job => !job.employee_id) : [];
+      %>
+      
+      <% if (availableJobs.length === 0) { %>
+        <p>No jobs available for this company.</p>
       <% } else { %>
         <div class="jobs-grid">
-          <% jobs.forEach(function(job){ %>
-            <% if (!job.employee_id) { %>
-              <article class="job-card" role="article">
-                <div class="job-title"><%= job.title %></div>
-                <div class="job-desc"><%= job.description %></div>
-                <div class="job-pay">Pay: <%= job.pay %></div>
-                <form action="/job/<%= job.id %>/apply" method="POST">
-                  <button type="submit" class="apply-btn">Apply</button>
-                </form>
-              </article>
-            <% } %>
+          <% availableJobs.forEach(function(job){ %>
+            <article class="job-card" role="article">
+              <div class="job-title"><%= job.title %></div>
+              <div class="job-desc"><%= job.description %></div>
+              <div class="job-pay">Pay: <%= job.pay %></div>
+              <form action="/job/<%= job.id %>/apply" method="POST">
+                <button type="submit" class="apply-btn">Apply</button>
+              </form>
+            </article>
           <% }) %>
         </div>
       <% } %>

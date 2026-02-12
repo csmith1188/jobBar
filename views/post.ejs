@@ -23,7 +23,7 @@
                     <%= error %>
                 </div>
                 <% } %>
-                    <form action="/post" method="POST">
+                    <form id="company-form" action="/post" method="POST">
                         <div class="form-row">
                             <label for="name">Company Name:</label>
                             <input type="text" id="name" name="name" required
@@ -54,6 +54,44 @@
                         <input type="hidden" id="bsColor" name="bsColor" value="#000000">
                         <button type="submit">Submit</button>
                     </form>
+                    <script>
+                        (function(){
+                            const form = document.getElementById('company-form');
+                            if (!form) return;
+                            let bypass = false;
+                            form.addEventListener('submit', async function(e){
+                                if (bypass) return; // allow normal submit when bypass is true
+                                e.preventDefault();
+                                const fd = new FormData(form);
+                                const payload = {
+                                    name: fd.get('name'),
+                                    description: fd.get('description'),
+                                    link: fd.get('link'),
+                                    pin: fd.get('pin') || ''
+                                };
+
+                                try {
+                                    const res = await fetch('/transfer/company', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        credentials: 'same-origin',
+                                        body: JSON.stringify(payload)
+                                    });
+                                    const data = await res.json().catch(()=>({}));
+                                    if (res.ok && data && data.success) {
+                                        // proceed to submit the original form to /post to persist company
+                                        bypass = true;
+                                        form.submit();
+                                    } else {
+                                        alert('Payment failed: ' + (data && data.message ? data.message : 'unknown'));
+                                    }
+                                } catch(err) {
+                                    console.error('Payment error', err);
+                                    alert('Payment failed');
+                                }
+                            });
+                        })();
+                    </script>
         </div>
     </div>
 </body>

@@ -113,7 +113,7 @@ const companiesRouter = require('./routes/companies');
 const postRouter = require('./routes/post');
 const jobPostsRouter = require('./routes/jobPosts');
 const jobRouter = require('./routes/job');
-const payRouter = require('./socket/pay');
+const payRouter = require('./routes/payment');
 const jobManagerRouter = require('./routes/jobManager');
 const allJobsRouter = require('./routes/allJobs');
 app.use('/', indexRouter);

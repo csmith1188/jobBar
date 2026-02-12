@@ -10,7 +10,7 @@
 </head>
 
 <body style="
-  background: <%= company ? 'linear-gradient(135deg, ' + company.pColor + ', ' + company.sColor + ')' : 'transparent' %>;
+  background: <%= company ? 'linear-gradient(180deg, ' + company.pColor + ', ' + company.sColor + ')' : 'transparent' %>;
   color: <%= company.bpColor %>;
   --pColor: <%= company.pColor %>;
   --sColor: <%= company.sColor %>;
@@ -147,8 +147,9 @@
 
   <script>
     // Only handle the PIN popup for Mark As Complete
-    document.addEventListener('DOMContentLoaded', function () {
+    (function () {
       const popup = document.getElementById('custom-popup');
+      if (!popup) { console.warn('JobManager: PIN popup element not found'); return; }
       const closeBtn = popup.querySelector('.close-btn');
       const popupForm = document.getElementById('popup-form');
       
@@ -157,59 +158,83 @@
       let currentPay = null;
       let currentTitle = null;
 
-      // Handle "Mark As Complete" button clicks
-      document.querySelectorAll('.complete-button').forEach(button => {
-        button.addEventListener('click', function () {
-          currentJobId = this.getAttribute('data-job-id');
-          currentEmployeeId = this.getAttribute('data-employee-id');
-          currentPay = this.getAttribute('data-pay');
-          currentTitle = this.getAttribute('data-title');
+      // Handle "Mark As Complete" button clicks using event delegation
+      document.addEventListener('click', function (ev) {
+        const btn = ev.target.closest && ev.target.closest('.complete-button');
+        if (!btn) return;
+        ev.preventDefault();
+        try {
+          currentJobId = btn.getAttribute('data-job-id');
+          currentEmployeeId = btn.getAttribute('data-employee-id');
+          currentPay = btn.getAttribute('data-pay');
+          currentTitle = btn.getAttribute('data-title');
+          console.log('JobManager: opening PIN popup for job', currentJobId, { employee: currentEmployeeId, pay: currentPay });
+          // show popup and focus pin input
           popup.style.display = 'flex';
-        });
+          const pinEl = document.getElementById('pin');
+          if (pinEl) { pinEl.value = ''; setTimeout(() => pinEl.focus(), 30); }
+        } catch (err) {
+          console.error('JobManager: error opening popup', err);
+        }
       });
 
       // Close popup
-      closeBtn.addEventListener('click', function () {
+      if (closeBtn) closeBtn.addEventListener('click', function () {
         popup.style.display = 'none';
-        popupForm.reset();
+        if (popupForm) popupForm.reset();
       });
 
       popup.addEventListener('click', function (e) {
         if (e.target === popup) {
           popup.style.display = 'none';
-          popupForm.reset();
+          if (popupForm) popupForm.reset();
         }
       });
 
-      // Handle form submission
+      if (!popupForm) { console.warn('JobManager: popup form not found'); return; }
+
+      // Handle form submission: call server transfer endpoint with PIN, then reload on success
       popupForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const pin = document.getElementById('pin').value;
+        const pinEl = document.getElementById('pin');
+        const pin = pinEl ? pinEl.value : '';
 
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/jobManager/complete';
+        if (!currentJobId || !currentEmployeeId || !currentPay) {
+          alert('Missing job context. Refresh the page and try again.');
+          return;
+        }
 
-        const fields = {
+        const payload = {
           jobId: currentJobId,
-          employeeId: currentEmployeeId,
-          pay: currentPay,
-          title: currentTitle,
+          to: currentEmployeeId,
+          amount: currentPay,
+          reason: `Completed ${currentTitle || ''}`,
           pin: pin
         };
 
-        for (const [key, value] of Object.entries(fields)) {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = value;
-          form.appendChild(input);
-        }
+        // hide popup while processing
+        popup.style.display = 'none';
 
-        document.body.appendChild(form);
-        form.submit();
+        try {
+          const res = await fetch('/transfer/complete', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data && data.success) {
+            // success: reload to reflect changes
+            window.location.reload();
+          } else {
+            alert('Transfer failed: ' + (data && data.message ? data.message : 'unknown'));
+          }
+        } catch (err) {
+          console.error('Transfer error', err);
+          alert('Transfer error');
+        }
       });
-    });
+    })();
   </script>
 </body>
 

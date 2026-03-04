@@ -135,4 +135,91 @@ router.post('/edit/job/:jobId', isAuthenticated, (req, res) => {
     });
 });
 
+// --- routes for editing positions ---
+router.get('/edit/position/:positionId', isAuthenticated, (req, res) => {
+    const db = req.app.locals.db;
+    const fb_id = req.session.fb_id;
+    const userFb = fb_id ? String(fb_id) : null;
+    const positionId = req.params.positionId;
+
+    if (!fb_id) {
+        return res.status(403).send('Forbidden: You must be logged in to edit a position');
+    }
+
+    const query = `SELECT p.*, c.owner_id, c.name AS company_name FROM company_positions p LEFT JOIN companies c ON p.company_id = c.id WHERE p.id = ?`;
+    db.get(query, [positionId], (err, position) => {
+        if (err) {
+            console.error('Database error fetching position:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+        if (!position) return res.status(404).send('Position not found');
+
+        const companyOwnerFb = position.owner_id != null ? String(position.owner_id) : null;
+        // if the position isn't associated with any company, only allow admin (fb '1')
+        if (!companyOwnerFb && userFb !== '1') return res.status(403).send('Forbidden: Position is not associated with a company you own');
+        if (userFb !== '1' && companyOwnerFb !== userFb) return res.status(403).send("Forbidden: You do not own this position's company");
+
+        if (position.status === 'in_progress' || position.status === 'completed') {
+            const companyName = position.company_name || '';
+            return res.redirect('/positionManager/' + encodeURIComponent(companyName) + '?error=' + encodeURIComponent('Too late to edit this position.'));
+        }
+
+        // fetch company details and tags for rendering
+        db.get('SELECT * FROM companies WHERE id = ?', [position.company_id], (err2, company) => {
+            if (err2) {
+                console.error('Database error fetching company for position edit:', err2);
+                return res.status(500).send('Internal Server Error');
+            }
+
+            db.all('SELECT t.name FROM tags t JOIN position_tags pt ON pt.tag_id = t.id WHERE pt.position_id = ?', [positionId], (tErr, tagRows) => {
+                if (tErr) {
+                    console.error('Database error fetching position tags:', tErr);
+                    return res.status(500).send('Internal Server Error');
+                }
+                const tags = (tagRows || []).map(r => r.name);
+                res.render('edit', { type: 'position', position, company: company || null, tags });
+            });
+        });
+    });
+});
+
+router.post('/edit/position/:positionId', isAuthenticated, (req, res) => {
+    const db = req.app.locals.db;
+    const fb_id = req.session.fb_id;
+    const positionId = req.params.positionId;
+
+    if (!fb_id) return res.status(403).send('Forbidden: You must be logged in to edit a position');
+
+    const { title, description, link } = req.body;
+    if (!title || !description) return res.status(400).send('Title and description are required.');
+
+    db.get('SELECT p.*, c.owner_id, c.name AS company_name FROM company_positions p LEFT JOIN companies c ON p.company_id = c.id WHERE p.id = ?', [positionId], (err, position) => {
+        if (err) {
+            console.error('Database error checking position before edit:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+        if (!position) return res.status(404).send('Position not found');
+
+        const companyOwnerFb = position.owner_id != null ? String(position.owner_id) : null;
+        const userFb = fb_id ? String(fb_id) : null;
+        if (!companyOwnerFb && userFb !== '1') return res.status(403).send('Forbidden: Position is not associated with a company you own');
+        if (userFb !== '1' && companyOwnerFb !== userFb) return res.status(403).send("Forbidden: You do not own this position's company");
+
+        if (position.status === 'in_progress' || position.status === 'completed') {
+            const companyName = position.company_name || '';
+            return res.redirect('/positionManager/' + encodeURIComponent(companyName) + '?error=' + encodeURIComponent('Too late to edit this position.'));
+        }
+
+        const updateQuery = 'UPDATE company_positions SET title = ?, description = ?, link = ? WHERE id = ?';
+        db.run(updateQuery, [title, description, link || '', positionId], function(updateErr) {
+            if (updateErr) {
+                console.error('Database error updating position:', updateErr);
+                return res.status(500).send('Internal Server Error');
+            }
+            const companyName = position.company_name || '';
+            res.redirect('/positionManager/' + encodeURIComponent(companyName));
+        });
+    });
+});
+
 module.exports = router;

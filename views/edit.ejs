@@ -18,9 +18,14 @@
     <% } %>
 >
     <nav class="top-controls">
-        <button class="small-btn" onclick="location.href='/companies'" style="border: 1px solid <%= company.bsColor %>;">Companies</button>
-        <button class="small-btn" onclick="location.href='/job/<%= encodeURIComponent(company.name) %>'" style="border: 1px solid <%= company.bsColor %>;">Job Page</button>
-        <button class="small-btn" onclick="location.href='/jobManager/<%= encodeURIComponent(company.name) %>'" style="border: 1px solid <%= company.bsColor %>;">Manager Page</button>
+        <button class="small-btn" onclick="location.href='/companies'">Companies</button>
+        <% if (typeof company !== 'undefined' && company && company.name) { %>
+            <button class="small-btn" onclick="location.href='/job/<%= encodeURIComponent(company.name) %>'" style="border: 1px solid <%= company.bsColor %>;">Job Page</button>
+            <% /* choose manager path depending on what is being edited */ %>
+            <% let managerPath = '/jobManager/' + encodeURIComponent(company.name); %>
+            <% if (type === 'position') { managerPath = '/positionManager/' + encodeURIComponent(company.name); } %>
+            <button class="small-btn" onclick="location.href='<%= managerPath %>'" style="border: 1px solid <%= company.bsColor %>;">Manager Page</button>
+        <% } %>
     </nav>
 
     <div class="container">
@@ -102,6 +107,100 @@
                         <input type="number" id="pay" name="pay" required value="<%= job.pay %>">
                     </div>
                     <input type="hidden" name="status" value="available">
+                    <button type="submit" style="background-color: <%= (company && company.pColor) ? company.pColor : '#333' %>; color: <%= (company && company.bpColor) ? company.bpColor : '#fff' %>; border: 1px solid <%= (company && company.bpColor) ? company.bpColor : '#fff' %>;">Submit</button>
+                </form>
+            <% } else if (type === 'position' && position) { %>
+                <h1>Edit Position</h1>
+                <form id="position-form" action="/edit/position/<%= position.id %>" method="POST">
+                    <input type="hidden" name="company" value="<%= company && company.name ? company.name : position.company_name || '' %>">
+                                        <div class="form-row">
+                    <label for="title">Position Title</label>
+                    <input id="title" name="title" type="text" maxlength="120" required value="<%= position.title %>">
+                </div>
+
+                <div class="form-row">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" maxlength="1000" required><%= position.description || '' %></textarea>
+                </div>
+
+                <div class="form-row">
+                    <label>Tags</label>
+                    <div id="tags-root">
+                        <div id="tag-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+                        <div style="display:flex;gap:6px">
+                            <input id="tag-input" type="text" placeholder="Add a tag (e.g. frontend developer)" style="flex:1;padding:0.5rem;border-radius:8px;border:1px solid rgba(0,0,0,0.08)">
+                            <button id="add-tag" type="button">Add</button>
+                        </div>
+                    </div>
+                    <input type="hidden" name="tags" id="tags-hidden" value="<%= (typeof tags !== 'undefined' && tags && tags.length) ? tags.join(',') : '' %>">
+                </div>
+
+                <script>
+                    (function(){
+                        const input = document.getElementById('tag-input');
+                        const btn = document.getElementById('add-tag');
+                        const list = document.getElementById('tag-list');
+                        const hidden = document.getElementById('tags-hidden');
+
+                        // server-provided tags array
+                        const initialTags = <%- JSON.stringify(tags || []) %>;
+
+                        function getTags(){
+                            return hidden.value ? hidden.value.split(',').map(s=>s.trim()).filter(Boolean) : [];
+                        }
+                        function setTags(arr){ hidden.value = arr.join(','); }
+
+                        function render(){
+                            list.innerHTML = '';
+                            getTags().forEach(t => {
+                                const chip = document.createElement('span');
+                                chip.textContent = t;
+                                chip.style.padding = '6px 8px';
+                                chip.style.borderRadius = '12px';
+                                chip.style.background = 'rgba(0,0,0,0.06)';
+                                chip.style.cursor = 'default';
+                                chip.style.display = 'inline-flex';
+                                chip.style.alignItems = 'center';
+                                chip.style.gap = '6px';
+
+                                const remove = document.createElement('button');
+                                remove.type = 'button';
+                                remove.textContent = '×';
+                                remove.style.border = 'none';
+                                remove.style.background = 'transparent';
+                                remove.style.cursor = 'pointer';
+                                remove.addEventListener('click', ()=>{
+                                    const arr = getTags().filter(x => x !== t);
+                                    setTags(arr);
+                                    render();
+                                });
+
+                                chip.appendChild(remove);
+                                list.appendChild(chip);
+                            })
+                        }
+
+                        btn.addEventListener('click', ()=>{
+                            const v = input.value.trim();
+                            if (!v) return;
+                            const arr = getTags();
+                            if (!arr.map(a=>a.toLowerCase()).includes(v.toLowerCase())) {
+                                arr.push(v);
+                                setTags(arr);
+                                render();
+                            }
+                            input.value = '';
+                            input.focus();
+                        });
+
+                        input.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') { e.preventDefault(); btn.click(); } });
+
+                        // initialize
+                        if (initialTags && initialTags.length) setTags(initialTags);
+                        render();
+                    })();
+                </script>
+                    
                     <button type="submit" style="background-color: <%= (company && company.pColor) ? company.pColor : '#333' %>; color: <%= (company && company.bpColor) ? company.bpColor : '#fff' %>; border: 1px solid <%= (company && company.bpColor) ? company.bpColor : '#fff' %>;">Submit</button>
                 </form>
 

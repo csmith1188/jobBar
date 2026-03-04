@@ -21,7 +21,10 @@
         <button class="small-btn" onclick="location.href='/companies'">Companies</button>
         <% if (typeof company !== 'undefined' && company && company.name) { %>
             <button class="small-btn" onclick="location.href='/job/<%= encodeURIComponent(company.name) %>'" style="border: 1px solid <%= company.bsColor %>;">Job Page</button>
-            <button class="small-btn" onclick="location.href='/jobManager/<%= encodeURIComponent(company.name) %>'" style="border: 1px solid <%= company.bsColor %>;">Manager Page</button>
+            <% /* choose manager path depending on what is being edited */ %>
+            <% let managerPath = '/jobManager/' + encodeURIComponent(company.name); %>
+            <% if (type === 'position') { managerPath = '/positionManager/' + encodeURIComponent(company.name); } %>
+            <button class="small-btn" onclick="location.href='<%= managerPath %>'" style="border: 1px solid <%= company.bsColor %>;">Manager Page</button>
         <% } %>
     </nav>
 

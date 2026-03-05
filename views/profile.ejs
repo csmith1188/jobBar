@@ -89,12 +89,18 @@
                         <p class="emptyTxt">Not assigned to any issues</p>
                     <% } %>
                 </section>
-            <section>
+            <section id="empSec">
                 <div class="title">Employment Status</div>
-                <% if (positionsCompleted && positionsCompleted.length > 0) { %>
+                <% if (positionsAccepted && positionsAccepted.length > 0) { %>
                     <ul>
-                        <% positionsCompleted.forEach(p => { %>
-                            <li><strong><%= p.title %></strong> at <em><%= p.company_name || 'Company' %></em></li>
+                        <% positionsAccepted.forEach(p => { %>
+                            <li class="empPos">
+                                <div class="empTtl">
+                                    <strong><%= p.title %></strong>
+                                    <a href="/job/<%= encodeURIComponent(p.company_name) %>"><%= p.company_name || 'Company' %></a>
+                                </div>
+                            </li>
+                            <% if (positionsAccepted.indexOf(p) < positionsAccepted.length - 1) { %><hr><% } %>
                         <% }) %>
                     </ul>
                 <% } else { %>

@@ -50,6 +50,10 @@ body{
     height: 300px;
 }
 
+#info #empSec {
+    height: 400px;
+}
+
 #info ul {
     list-style: none;
     padding-left: 0;
@@ -312,4 +316,37 @@ body{
 
 .accPos #posBtn:hover .tooltip {
     opacity: 1;
+}
+
+.empPos {
+    padding: 0px 20px 5px 20px;
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0 5px 0;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.empPos strong {
+    font-size: 1.4em;
+}
+
+.empPos .empTtl {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: left;
+}
+
+.empPos a {
+    text-decoration: none;
+    color: var(--muted);
+    font-style: italic;
+}
+
+.empPos a:hover {
+    color: var(--accent-2);
+    text-decoration: underline;
 }

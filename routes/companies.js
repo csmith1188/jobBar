@@ -58,9 +58,13 @@ router.post('/companies/delete', isAuthenticated, (req, res) => {
                         const appIds = (appRows || []).map(r => r.id);
                         if (appIds.length > 0) {
                             const phApps = appIds.map(() => '?').join(',');
-                            db.run(`DELETE FROM job_application_files WHERE application_id IN (${phApps})`, appIds, function(errf) {
-                                if (errf) console.error('Error deleting job_application_files for jobs', errf);
-                            });
+                                db.run(`DELETE FROM job_application_files WHERE application_id IN (${phApps})`, appIds, function(errf) {
+                                    if (errf) console.error('Error deleting job_application_files for jobs', errf);
+                                });
+                                // delete any applicant details associated with these applications
+                                db.run(`DELETE FROM job_applicant_details WHERE application_id IN (${phApps})`, appIds, function(errd) {
+                                    if (errd) console.error('Error deleting job_applicant_details for jobs', errd);
+                                });
                         }
                         db.run(`DELETE FROM job_applications WHERE job_id IN (${phJobs})`, jobIds, function(errja) {
                             if (errja) console.error('Error deleting job_applications for jobs', errja);
@@ -84,6 +88,10 @@ router.post('/companies/delete', isAuthenticated, (req, res) => {
                             db.run(`DELETE FROM job_application_files WHERE application_id IN (${phPosApps})`, posAppIds, function(errpf) {
                                 if (errpf) console.error('Error deleting job_application_files for position applications', errpf);
                             });
+                            // delete any applicant details tied to these position applications
+                            db.run(`DELETE FROM job_applicant_details WHERE application_id IN (${phPosApps})`, posAppIds, function(errpd) {
+                                if (errpd) console.error('Error deleting job_applicant_details for position applications', errpd);
+                            });
                         }
                         db.run(`DELETE FROM position_applications WHERE position_id IN (${phPos})`, posIds, function(errpa) { if (errpa) console.error('Error deleting position_applications', errpa); });
                     });
@@ -95,6 +103,9 @@ router.post('/companies/delete', isAuthenticated, (req, res) => {
                     db.run(`DELETE FROM company_positions WHERE id IN (${phPos})`, posIds, function(errp) { if (errp) console.error('Error deleting company_positions', errp); });
                 }
             });
+
+            // remove company employees records
+            db.run('DELETE FROM company_employees WHERE company_id = ?', [company.id], function(errce) { if (errce) console.error('Error deleting company_employees for company', errce); });
 
             // Finally delete the company
             db.run('DELETE FROM companies WHERE id = ?', [company.id], function(errc) {

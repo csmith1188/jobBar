@@ -137,11 +137,31 @@ router.post('/jobManager/accept', isAuthenticated, async (req, res) => {
             );
         });
 
-        // Remove all applications for this job
+        // Remove all applications for this job and any related files/details
         await new Promise((resolve, reject) => {
-            db.run('DELETE FROM job_applications WHERE job_id = ?', [jobId], (err) => {
-                if (err) reject(err);
-                else resolve();
+            db.all('SELECT id FROM job_applications WHERE job_id = ?', [jobId], (ea, rows) => {
+                if (ea) return reject(ea);
+                const appIds = (rows || []).map(r => r.id);
+                if (appIds.length === 0) {
+                    // nothing to remove
+                    return db.run('DELETE FROM job_applications WHERE job_id = ?', [jobId], (err) => err ? reject(err) : resolve());
+                }
+
+                const ph = appIds.map(() => '?').join(',');
+
+                // delete files attached to these applications
+                db.run(`DELETE FROM job_application_files WHERE application_id IN (${ph})`, appIds, function(errf) {
+                    if (errf) console.error('Error deleting job_application_files on accept:', errf);
+                    // delete applicant details for these applications
+                    db.run(`DELETE FROM job_applicant_details WHERE application_id IN (${ph})`, appIds, function(errd) {
+                        if (errd) console.error('Error deleting job_applicant_details on accept:', errd);
+                        // finally delete the application rows
+                        db.run(`DELETE FROM job_applications WHERE job_id = ?`, [jobId], function(errja) {
+                            if (errja) return reject(errja);
+                            resolve();
+                        });
+                    });
+                });
             });
         });
 

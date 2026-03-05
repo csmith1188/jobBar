@@ -104,7 +104,12 @@
                                 <div class="empActions">
                                     <form action="/profile/quit-position" method="POST" onsubmit="return confirm('Are you sure you want to quit this position?');">
                                         <input type="hidden" name="positionId" value="<%= p.id %>">
-                                        <button type="submit" class="small-btn quit-btn">Quit</button>
+                                        <div class="btn">
+                                            <button type="submit" class="quit-btn">
+                                                <img src="/icons/quit.png" width="25" height="25">
+                                            </button>
+                                            <div class="tooltip" id="quit">Resign</div>
+                                        </div>
                                     </form>
                                 </div>
                             </li>

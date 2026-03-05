@@ -47,16 +47,18 @@
                     <% } %>
                 </section>
 
-                <section>
-                    <div class="title">Positions You Applied To</div>
+                <section id="posSec">
+                    <div class="title">Positions Applied To</div>
                     <% if (positionsApplied && positionsApplied.length > 0) { %>
                         <ul>
                             <% positionsApplied.forEach(p => { %>
-                                <li>
-                                    <strong><%= p.title %></strong>
-                                    <a href="/eJob/<%= encodeURIComponent(p.company_name || '') %>">View Position</a>
-                                    <em><%= p.company_name || 'Company' %></em>
+                                <li class="accPos">
+                                    <div class="posTtl">
+                                        <strong><%= p.title.length > 30 ? p.title.substring(0, 30) + '...' : p.title %></strong>
+                                        <a href="/job/<%= encodeURIComponent(p.company_name) %>"><%= p.company_name %></a>
+                                    </div>
                                 </li>
+                                <% if (positionsApplied.indexOf(p) < positionsApplied.length - 1) { %><hr><% } %>
                             <% }) %>
                         </ul>
                     <% } else { %>

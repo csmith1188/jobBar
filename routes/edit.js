@@ -159,7 +159,7 @@ router.get('/edit/position/:positionId', isAuthenticated, (req, res) => {
         if (!companyOwnerFb && userFb !== '1') return res.status(403).send('Forbidden: Position is not associated with a company you own');
         if (userFb !== '1' && companyOwnerFb !== userFb) return res.status(403).send("Forbidden: You do not own this position's company");
 
-        if (position.status === 'in_progress' || position.status === 'completed') {
+        if (position.status === 'in_progress' || position.status === 'filled' || position.status === 'completed') {
             const companyName = position.company_name || '';
             return res.redirect('/positionManager/' + encodeURIComponent(companyName) + '?error=' + encodeURIComponent('Too late to edit this position.'));
         }
@@ -205,7 +205,7 @@ router.post('/edit/position/:positionId', isAuthenticated, (req, res) => {
         if (!companyOwnerFb && userFb !== '1') return res.status(403).send('Forbidden: Position is not associated with a company you own');
         if (userFb !== '1' && companyOwnerFb !== userFb) return res.status(403).send("Forbidden: You do not own this position's company");
 
-        if (position.status === 'in_progress' || position.status === 'completed') {
+        if (position.status === 'in_progress' || position.status === 'filled' || position.status === 'completed') {
             const companyName = position.company_name || '';
             return res.redirect('/positionManager/' + encodeURIComponent(companyName) + '?error=' + encodeURIComponent('Too late to edit this position.'));
         }

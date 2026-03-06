@@ -17,28 +17,6 @@ body{
   -moz-osx-font-smoothing:grayscale;
 }
 
-header{
-  max-width:1100px;
-  margin: 0rem auto;
-  padding:1.25rem;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:1rem;
-}
-
-header h1{
-  margin:0;
-  font-size:clamp(1.25rem, 2.6vw, 1.9rem);
-  color:#fff;
-  text-shadow:0 6px 18px rgba(0,0,0,0.45);
-}
-
-header > div{
-  display:flex;
-  gap:0.6rem;
-}
-
 button, .small-btn, a.button-link{
   padding:0.6rem 1.2rem;
   border-radius:8px;
@@ -118,11 +96,4 @@ section{max-width:1100px;margin:0 auto;}
 #resourceCont a:hover{
   transform:translateY(-3px);
   box-shadow:0 6px 16px rgba(0,0,0,0.3);
-}
-
-@media (max-width:640px){
-  header{flex-direction:column;align-items:flex-start}
-  header > div{width:100%;justify-content:flex-start}
-  button{padding:0.5rem 0.8rem}
-  input#searchbar{max-width:95%}
 }

@@ -1,3 +1,21 @@
 .tophr {
     width: 100%;
 }
+
+.tophead {
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.topHead .contain {
+    display: flex;
+    flex-direction: row;
+}
+
+.topHead .contain .buttonsCont {
+    display: flex;
+    flex-direction: row;
+    height: 60px;
+    bottom: 0;
+}

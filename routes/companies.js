@@ -117,4 +117,29 @@ router.post('/companies/delete', isAuthenticated, (req, res) => {
         });
     });
 });
+
+// Transfer company ownership (owner or admin only)
+router.post('/companies/transfer-owner', isAuthenticated, (req, res) => {
+    const companyId = req.body.companyId;
+    const newOwnerFb = req.body.newOwnerFb ? String(req.body.newOwnerFb).trim() : null;
+    if (!companyId || !newOwnerFb) return res.status(400).send('Missing parameters');
+
+    db.get('SELECT * FROM companies WHERE id = ?', [companyId], (err, company) => {
+        if (err) { console.error('DB error fetching company for transfer', err); return res.status(500).send('Internal Server Error'); }
+        if (!company) return res.status(404).send('Company not found');
+
+        const ownerFb = company.owner_id != null ? String(company.owner_id) : null;
+        const userFb = req.session && req.session.fb_id ? String(req.session.fb_id) : null;
+
+        // Only admin (fb '1') or current owner may transfer
+        if (userFb !== '1' && ownerFb !== userFb) {
+            return res.status(403).send('You do not have permission to transfer this company');
+        }
+
+        db.run('UPDATE companies SET owner_id = ? WHERE id = ?', [newOwnerFb, companyId], function(uErr) {
+            if (uErr) { console.error('Error transferring ownership', uErr); return res.status(500).send('Internal Server Error'); }
+            return res.redirect('/profile');
+        });
+    });
+});
 module.exports = router;

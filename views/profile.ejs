@@ -39,6 +39,12 @@
                                         </a>
                                         <div class="tooltip" id="edit">Edit Company</div>
                                     </div>
+                                    <div class="btn">
+                                        <button class="transfer-btn" type="button" data-company-id="<%= c.id %>" data-company-name="<%= c.name %>">
+                                            Transfer
+                                        </button>
+                                        <div class="tooltip">Transfer Ownership</div>
+                                    </div>
                                 </div>
                             </li>
                             <% if (companies.indexOf(c) < companies.length - 1) { %><hr><% } %>
@@ -69,7 +75,7 @@
                 </section>
 
                 <section id="issuesSec">
-                    <div class="title">Issues</div>
+                    <div class="title">Contracts</div>
                     <% if ((jobsApplied && jobsApplied.length > 0) || (jobsAccepted && jobsAccepted.length > 0)) { %>
                         <ul>
                             <% if (jobsApplied && jobsApplied.length > 0) { %>
@@ -111,7 +117,7 @@
                             <% } %>
                         </ul>
                     <% } else { %>
-                        <p class="emptyTxt">No issues found</p>
+                        <p class="emptyTxt">No Contracts found</p>
                     <% } %>
                 </section>
             <section id="empSec">
@@ -214,6 +220,49 @@
 
             window.addEventListener('scroll', () => { if (!lockedLi) hidePopup(); });
             window.addEventListener('resize', () => { if (!lockedLi) hidePopup(); });
+        });
+    </script>
+
+    <!-- Transfer Ownership Modal -->
+    <div id="transfer-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); align-items:center; justify-content:center; z-index:10000;">
+        <div style="background:#fff; padding:18px; border-radius:8px; width:360px; max-width:92%; box-shadow:0 10px 30px rgba(0,0,0,0.4);">
+            <h3 style="margin-top:0;">Transfer Company Ownership</h3>
+            <p id="transfer-company-name" style="margin:6px 0 12px 0; font-weight:600;"></p>
+            <form id="transfer-form" action="/companies/transfer-owner" method="POST" onsubmit="return confirm('Are you sure you want to transfer ownership of this company?');">
+                <input type="hidden" name="companyId" id="transfer-company-id" value="">
+                <label for="newOwnerFb">New Owner fb_id</label>
+                <input id="newOwnerFb" name="newOwnerFb" type="text" required style="width:100%; padding:8px; margin:8px 0 12px 0;">
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                    <button type="button" id="transfer-cancel" style="padding:8px 12px;">Cancel</button>
+                    <button type="submit" style="padding:8px 12px; background:#2a7; color:#fff; border:none; border-radius:4px;">Transfer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Transfer modal behavior
+        document.addEventListener('DOMContentLoaded', function(){
+            const modal = document.getElementById('transfer-modal');
+            const companyIdInput = document.getElementById('transfer-company-id');
+            const companyNameEl = document.getElementById('transfer-company-name');
+            const cancelBtn = document.getElementById('transfer-cancel');
+
+            document.querySelectorAll('.transfer-btn').forEach(btn => {
+                btn.addEventListener('click', function(){
+                    const id = this.getAttribute('data-company-id');
+                    const name = this.getAttribute('data-company-name') || '';
+                    companyIdInput.value = id;
+                    companyNameEl.textContent = name;
+                    modal.style.display = 'flex';
+                    document.getElementById('newOwnerFb').focus();
+                });
+            });
+
+            cancelBtn.addEventListener('click', function(){ modal.style.display = 'none'; });
+
+            // close modal on outside click
+            modal.addEventListener('click', function(e){ if (e.target === modal) modal.style.display = 'none'; });
         });
     </script>
 

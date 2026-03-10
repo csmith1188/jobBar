@@ -18,11 +18,8 @@
             <%  if (companies && companies.length > 0) { %>
                 <ul>
                     <% companies.forEach(company => { %>
-                        <div class="company-item" style="background: linear-gradient(
-                        to top,
-                        <%= company.pColor %>35 0%,
-                        rgba(255,255,255,0.03) 75%
-                        ); color: <%= company.bpColor %>;">
+                        <div class="company-item" style="background:
+                        rgba(255,255,255,0.03); color: <%= company.bpColor %>;">
                             <div class="nme">
                                 <strong><%= company.name %></strong>
                                 <% if (company.isOwner) { %>

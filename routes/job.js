@@ -92,40 +92,52 @@ router.post('/job/:jobId/apply', isAuthenticated, (req, res) => {
 
     if (!fbId) return res.status(400).send('User not identified');
 
-    // Ensure the applications table exists and insert an application for this user/job.
-    db.run(
-        `CREATE TABLE IF NOT EXISTS job_applications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            job_id INTEGER NOT NULL,
-            fb_id TEXT NOT NULL,
-            applied_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(job_id, fb_id)
-        )`
-    , (createErr) => {
-        if (createErr) {
-            console.error('Failed to ensure job_applications table:', createErr);
+    // Prevent applying to a job that has been marked completed
+    db.get('SELECT status FROM jobs WHERE id = ?', [jobId], (sErr, jRow) => {
+        if (sErr) {
+            console.error('Error checking job status:', sErr);
             return res.status(500).send('Internal Server Error');
         }
+        if (jRow && jRow.status === 'completed') {
+            return res.status(400).send('Cannot apply to a completed job');
+        }
 
-        // Insert the application (or ignore if already exists). Employed users are allowed to apply for jobs.
-        db.run('INSERT OR IGNORE INTO job_applications (job_id, fb_id) VALUES (?, ?)', [jobId, fbId], function(insertErr) {
-            if (insertErr) {
-                console.error('Failed to insert application:', insertErr);
+        // proceed to ensure applications table exists and insert
+
+        db.run(
+            `CREATE TABLE IF NOT EXISTS job_applications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                job_id INTEGER NOT NULL,
+                fb_id TEXT NOT NULL,
+                applied_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(job_id, fb_id)
+            )`
+        , (createErr) => {
+            if (createErr) {
+                console.error('Failed to ensure job_applications table:', createErr);
                 return res.status(500).send('Internal Server Error');
             }
 
-            // Redirect back to referrer when possible, otherwise company job page
-            db.get('SELECT company FROM jobs WHERE id = ?', [jobId], (err, job) => {
-                if (err) {
-                    console.error('Error fetching job:', err);
-                    return res.redirect('/');
+            // Insert the application (or ignore if already exists). Employed users are allowed to apply for jobs.
+            db.run('INSERT OR IGNORE INTO job_applications (job_id, fb_id) VALUES (?, ?)', [jobId, fbId], function(insertErr) {
+                if (insertErr) {
+                    console.error('Failed to insert application:', insertErr);
+                    return res.status(500).send('Internal Server Error');
                 }
 
-                if (!job) return res.redirect('/');
+                // Redirect back to referrer when possible, otherwise company job page
+                db.get('SELECT company FROM jobs WHERE id = ?', [jobId], (err, job) => {
+                    if (err) {
+                        console.error('Error fetching job:', err);
+                        return res.redirect('/');
+                    }
 
-                const referer = req.get('Referer') || req.get('referer') || null;
-                if (referer) return res.redirect(referer);
-                return res.redirect(`/job/${encodeURIComponent(job.company)}`);
+                    if (!job) return res.redirect('/');
+
+                    const referer = req.get('Referer') || req.get('referer') || null;
+                    if (referer) return res.redirect(referer);
+                    return res.redirect(`/job/${encodeURIComponent(job.company)}`);
+                });
             });
         });
     });

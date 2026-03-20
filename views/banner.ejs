@@ -4,9 +4,16 @@
         <div class="offset">
             <div class="title">
                 <img src="/icons/jobbar.png" width="38" height="38">
-                <% if (typeof fb_id !== 'undefined' && fb_id) { %>
-                    <strong class="proftxt" onclick="location.href='/profile'"><%= user && user.username ? user.username : 'Guest' %></strong>
-                <% } %>
+                <div>
+                    <% if (typeof fb_id !== 'undefined' && fb_id) { %>
+                        <strong class="proftxt" onclick="location.href='/profile'"
+                        data-match="/companies,/Job,/eJob,/jobPosts,/jobManager,/ePost,/home,/positionManager,/edit">
+                            <%= user && user.username ? user.username : 'Guest' %>
+                            <%= (typeof company !== 'undefined' && company.name) ? ` / ${company.name}` : '' %>
+                                    <span id="page-type"></span>
+                        </strong>
+                    <% } %>
+                </div>
             </div>
             <div class="intC">
                 <div class="buttonsCont">
@@ -14,12 +21,9 @@
                         <img src="/icons/banner/issue.png" alt="All Issues" width="20" height="20">
                         <div>All Contracts</div>
                     </button>
-                    <button class="redir" data-path="/companies" data-match="/companies,/Job,/eJob,/jobPosts,/jobManager,/ePost,/home,/positionManager" onclick="location.href='/companies'">
+                    <button class="redir" data-path="/companies" onclick="location.href='/companies'">
                         <img src="/icons/banner/company.png" alt="Companies" width="18" height="18">
-                        <div>Companies
-                                <%= (typeof company !== 'undefined' && company.name) ? ` / ${company.name}` : '' %>
-                                <span id="page-type"></span>
-                        </div>
+                        <div>Companies</div>
                     </button>
                     <% if (isManager) { %>
                         <button class="redir" data-path="/post" onclick="location.href='/post'">
@@ -52,11 +56,26 @@
     });
     const path = window.location.pathname;
     const pageTypeEl = document.getElementById('page-type');
+    const button = document.createElement('button');
+    button.classList.add("redir");
 
-    if (path.includes('/eJob/')) pageTypeEl.textContent = ' / Positions';
-    else if (path.includes('/Job/')) pageTypeEl.textContent = ' / Issues';
-    else if (path.includes('jobPosts')) pageTypeEl.textContent = ' / Post Issue'
-    else if (path.includes('/jobManager')) pageTypeEl.textContent = ' / Manage Issues'
-    else if (path.includes('/ePost')) pageTypeEl.textContent = ' / Create Position'
-    else if (path.includes('/positionManager')) pageTypeEl.textContent = ' / Manage Positions'
+    if (path.includes('/eJob/')) {
+        button.textContent = ' / Positions';
+    } else if (path.includes('/Job/')) {
+        button.textContent = ' / Issues';
+    } else if (path.includes('jobPosts')) {
+        button.textContent = ' / Post Issue';
+    } else if (path.includes('/jobManager')) {
+        button.textContent = ' / Manage Issues';
+    } else if (path.includes('/ePost')) {
+        button.textContent = ' / Create Position';
+    } else if (path.includes('/positionManager')) {
+        button.textContent = ' / Manage Positions';
+    } else if (path.includes('/edit')) {
+        button.textContent = ' / Edit';
+    }
+
+    if (pageTypeEl) {
+        pageTypeEl.appendChild(button)
+    }
 </script>

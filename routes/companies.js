@@ -11,8 +11,18 @@ const db = new sqlite3.Database(dbFile, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CR
 });
 
 // Companies route
-router.get('/companies', isAuthenticated, (req, res) => {
+router.get('/companies', isAuthenticated, async (req, res) => {
     const fb = req.session && req.session.fb_id ? String(req.session.fb_id) : null;
+    const fbId = req.session.fb_id;
+    let user = '';
+
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
+
     db.all('SELECT * FROM companies ORDER BY id DESC', (err, rows) => {
         if (err) {
             console.error('Database error:', err);
@@ -24,7 +34,7 @@ router.get('/companies', isAuthenticated, (req, res) => {
             isOwner: fb ? (String(r.owner_id) === fb) : false
         }));
         const isManager = !!fb;
-        res.render('companies', { companies: normalized, user: req.user, fb_id: fb, isManager });
+        res.render('companies', { companies: normalized, user, fb_id: fb, isManager });
     });
 });
 

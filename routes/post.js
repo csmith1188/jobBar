@@ -9,12 +9,21 @@ const db = new sqlite3.Database(dbFile, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CR
     if (err) console.error('Failed to open database in free route:', err);
 });
 
-router.get('/post', isAuthenticated, (req, res) => {
+router.get('/post', isAuthenticated, async (req, res) => {
+    const fbId = req.session.fb_id;
+    let user = '';
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
     res.render('post', { 
         title: 'Post your Company', 
         fb_id: req.session.fb_id, 
         error: null, 
-        form: {} 
+        form: {},
+        user: user
     });
 });
 

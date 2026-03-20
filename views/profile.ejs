@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= user && user.username ? user.username + "'s Profile" : 'Profile' %></title>
     <link rel="stylesheet" href="/css/profile.css">
+    <link rel="icon" href="/icons/jobbar.png">
 </head>
 <body>
     <%- include("banner.ejs") %>
         <div id="parentCont">
             <div id="topInf">
-                <h1><%= user && user.username ? user.username : 'User' %>'s Profile</h1>
+                <h1><%= user && user.username ? user.username : 'Guest' %>'s Profile</h1>
 
                 <section>
                     <div id="fid">
@@ -28,21 +29,21 @@
                             <li class="accComp">
                                 <div class="compTtl"><strong><%= c.name.length > 30 ? c.name.substring(0, 30) + '...' : c.name %></strong></div>
                                 <div class="compBtnsCont">
-                                    <div class="btn">
+                                    <div class="btn" id="view">
                                         <a id="viewCompany" href="/job/<%= encodeURIComponent(c.name) %>">
                                             <img src="/icons/view.png" width="25" height="25">
                                         </a>
                                         <div class="tooltip">View Company</div>
                                     </div>
-                                    <div class="btn">
+                                    <div class="btn" id="edit">
                                         <a id="editCompany" href="/edit/company/<%= c.id %>">
                                             <img src="/icons/edit.png" width="25" height="25">
                                         </a>
                                         <div class="tooltip" id="edit">Edit Company</div>
                                     </div>
-                                    <div class="btn">
+                                    <div class="btn" id="tran">
                                         <button class="transfer-btn" type="button" data-company-id="<%= c.id %>" data-company-name="<%= c.name %>">
-                                            Transfer
+                                            <img src="/icons/transfer.png" width="25" height="25">
                                         </button>
                                         <div class="tooltip">Transfer Ownership</div>
                                     </div>
@@ -91,7 +92,10 @@
                                             <% if (j.link) { %>
                                                 <div class="popup-link">Link: <a href="<%= j.link %>" target="_blank" rel="noopener noreferrer"><%= j.link %></a></div>
                                             <% } %>
-                                            <div class="popup-pay">Pay: <%= typeof j.pay !== 'undefined' && j.pay !== null ? j.pay : 'N/A' %></div>
+                                            <div class="popup-pay">
+                                                <img src="/icons/cost.png" width="15" height="15">
+                                                <%= typeof j.pay !== 'undefined' && j.pay !== null ? j.pay : 'N/A' %>
+                                            </div>
                                         </div>
                                     </li>
                                     <% if (index < jobsApplied.length - 1 || (jobsAccepted && jobsAccepted.length > 0)) { %><hr><% } %>
@@ -110,7 +114,10 @@
                                             <% if (j.link) { %>
                                                 <div class="popup-link">Link: <a href="<%= j.link %>" target="_blank" rel="noopener noreferrer"><%= j.link %></a></div>
                                             <% } %>
-                                            <div class="popup-pay">Pay: <%= typeof j.pay !== 'undefined' && j.pay !== null ? j.pay : 'N/A' %></div>
+                                            <div class="popup-pay">
+                                                <img src="/icons/cost.png" width="15" height="15">
+                                                <%= typeof j.pay !== 'undefined' && j.pay !== null ? j.pay : 'N/A' %>
+                                            </div>
                                         </div>
                                     </li>
                                     <% if (index < jobsAccepted.length - 1) { %><hr><% } %>
@@ -161,7 +168,7 @@
         #floating-issue-popup .popup-title { font-weight:700; margin-bottom:6px; }
         #floating-issue-popup .popup-desc { margin-bottom:8px; white-space: pre-wrap; }
         #floating-issue-popup .popup-link a { color: #0077cc; word-break: break-all; }
-        #floating-issue-popup .popup-pay { margin-top:6px; font-weight:600; }
+        #floating-issue-popup .popup-pay { margin-top:6px; font-weight:600; display: flex; align-items: center; gap: 4px;}
     </style>
 
     <script>

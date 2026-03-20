@@ -5,15 +5,52 @@
     border-top: 1px solid gray;
 }
 
-.tophead {
+.topHead {
     display: flex;
     flex-direction: column;
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.topHead .title {
+    margin: 10px 10px 0px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.title .proftxt {
+    padding:0.6rem 0.5rem;
+    border-radius:8px;
+    border:none;
+    height: 35px;
+    background: transparent;
+    color:#fff;
+    cursor:pointer;
+    font-weight:bold;
+    transition:all 0.2s ease;
+    font-size: 0.9em;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title .proftxt:hover {
+    background-color: rgba(128, 128, 128, 0.26);
 }
 
 .topHead .contain {
     display: flex;
-    flex-direction: row;
-    background: rgba(0, 0, 0, 0.952);
+    flex-direction: column;
+    background: rgb(0, 0, 0);
+}
+
+.contain .offset {
+    margin-left: 10px;
 }
 
 .topHead .intC {
@@ -25,14 +62,13 @@
 
 .topHead .contain .buttonsCont {
     display: flex;
-    margin-left: 10px;
     flex-direction: row;
     gap: 10px;
     height: 60px;
 }
 
 .redir {
-    padding:0.6rem 1.1rem;
+    padding:0.6rem 0.5rem;
     border-radius:8px;
     border:none;
     height: 35px;

@@ -1,31 +1,37 @@
 <link rel="stylesheet" href="/css/banner.css">
 <header class="topHead">
     <div class="contain">
-        <div class="intC">
-            <div class="buttonsCont">
-                <button class="redir" data-path="/allJobs" onclick="location.href='/allJobs'">
-                    <img src="/icons/banner/issue.png" alt="All Issues" width="20" height="20">
-                    <div>All Issues</div>
-                </button>
-                <button class="redir" data-path="/companies" data-match="/companies,/Job,/eJob,/jobPosts,/jobManager,/ePost" onclick="location.href='/companies'">
-                    <img src="/icons/banner/company.png" alt="Companies" width="18" height="18">
-                    <div>Companies
+        <div class="offset">
+            <div class="title">
+                <img src="/icons/jobbar.png" width="38" height="38">
+                <div>
+                    <% if (typeof fb_id !== 'undefined' && fb_id) { %>
+                        <strong class="proftxt" onclick="location.href='/profile'"
+                        data-match="/companies,/Job,/eJob,/jobPosts,/jobManager,/ePost,/home,/positionManager,/edit">
+                            <%= user && user.username ? user.username : 'Guest' %>
                             <%= (typeof company !== 'undefined' && company.name) ? ` / ${company.name}` : '' %>
-                            <span id="page-type"></span>
-                    </div>
-                </button>
-                <% if (isManager) { %>
-                    <button class="redir" data-path="/post" onclick="location.href='/post'">
-                        <img src="/icons/banner/create.png" alt="Create a Company" width="18" height="18">
-                        <div>Create a Company</div>
+                                    <span id="page-type"></span>
+                        </strong>
+                    <% } %>
+                </div>
+            </div>
+            <div class="intC">
+                <div class="buttonsCont">
+                    <button class="redir" data-path="/allJobs" onclick="location.href='/allJobs'">
+                        <img src="/icons/banner/issue.png" alt="All Issues" width="20" height="20">
+                        <div>All Contracts</div>
                     </button>
-                <% } %>
-                <% if (typeof fb_id !== 'undefined' && fb_id) { %>
-                    <button class="redir" data-path="/profile" onclick="location.href='/profile'">
-                        <img src="/icons/banner/profile.png" alt="Profile" width="20" height="20">
-                        <div>Profile</div>
+                    <button class="redir" data-path="/companies" onclick="location.href='/companies'">
+                        <img src="/icons/banner/company.png" alt="Companies" width="18" height="18">
+                        <div>Companies</div>
                     </button>
-                <% } %>
+                    <% if (isManager) { %>
+                        <button class="redir" data-path="/post" onclick="location.href='/post'">
+                            <img src="/icons/banner/create.png" alt="Create a Company" width="18" height="18">
+                            <div>Create a Company</div>
+                        </button>
+                    <% } %>
+                </div>
             </div>
         </div>
     </div>
@@ -50,10 +56,26 @@
     });
     const path = window.location.pathname;
     const pageTypeEl = document.getElementById('page-type');
+    const button = document.createElement('button');
+    button.classList.add("redir");
 
-    if (path.includes('/eJob/')) pageTypeEl.textContent = ' / Positions';
-    else if (path.includes('/Job/')) pageTypeEl.textContent = ' / Issues';
-    else if (path.includes('jobPosts')) pageTypeEl.textContent = ' / Post Issue'
-    else if (path.includes('/jobManager')) pageTypeEl.textContent = ' / Manage Issues'
-    else if (path.includes('/ePost')) pageTypeEl.textContent = ' / Create Position'
+    if (path.includes('/eJob/')) {
+        button.textContent = ' / Positions';
+    } else if (path.includes('/Job/')) {
+        button.textContent = ' / Issues';
+    } else if (path.includes('jobPosts')) {
+        button.textContent = ' / Post Issue';
+    } else if (path.includes('/jobManager')) {
+        button.textContent = ' / Manage Issues';
+    } else if (path.includes('/ePost')) {
+        button.textContent = ' / Create Position';
+    } else if (path.includes('/positionManager')) {
+        button.textContent = ' / Manage Positions';
+    } else if (path.includes('/edit')) {
+        button.textContent = ' / Edit';
+    }
+
+    if (pageTypeEl) {
+        pageTypeEl.appendChild(button)
+    }
 </script>

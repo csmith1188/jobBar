@@ -2,10 +2,19 @@ require('dotenv').config();
 const router = require('express').Router();
 const isAuthenticated = require('../middleware/isAuthenticated');
 
-router.get('/edit/company/:companyId', isAuthenticated, (req, res) => {
+router.get('/edit/company/:companyId', isAuthenticated, async (req, res) => {
     const db = req.app.locals.db;
     const fb_id = req.session.fb_id;
     const userFb = fb_id ? String(fb_id) : null;
+    const fbId = req.session.fb_id;
+    let user = '';
+
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
     if (!fb_id) {
         return res.status(403).send('Forbidden: You must be logged in to edit a company');
     }
@@ -18,7 +27,7 @@ router.get('/edit/company/:companyId', isAuthenticated, (req, res) => {
             return res.status(404).send('Company not found');
         }
         // render shared edit page with company context
-        res.render('edit', { type: 'company', company });
+        res.render('edit', { type: 'company', company, user });
     });
 });
 
@@ -41,11 +50,20 @@ router.post('/edit/company/:companyId', isAuthenticated, (req, res) => {
     });
 });
 
-router.get('/edit/job/:jobId', isAuthenticated, (req, res) => {
+router.get('/edit/job/:jobId', isAuthenticated, async (req, res) => {
     const db = req.app.locals.db;
     const fb_id = req.session.fb_id;
     const userFb = fb_id ? String(fb_id) : null;
     const jobId = req.params.jobId;
+    const fbId = req.session.fb_id;
+    let user = '';
+
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
     if (!fb_id) {
         return res.status(403).send('Forbidden: You must be logged in to edit a job');
     }
@@ -79,7 +97,7 @@ router.get('/edit/job/:jobId', isAuthenticated, (req, res) => {
                 return res.status(500).send('Internal Server Error');
             }
             // render shared edit page with job + company context
-            res.render('edit', { type: 'job', job, company: company || null });
+            res.render('edit', { type: 'job', job, company: company || null, user });
         });
     });
 });
@@ -136,11 +154,20 @@ router.post('/edit/job/:jobId', isAuthenticated, (req, res) => {
 });
 
 // --- routes for editing positions ---
-router.get('/edit/position/:positionId', isAuthenticated, (req, res) => {
+router.get('/edit/position/:positionId', isAuthenticated, async (req, res) => {
     const db = req.app.locals.db;
     const fb_id = req.session.fb_id;
     const userFb = fb_id ? String(fb_id) : null;
     const positionId = req.params.positionId;
+    const fbId = req.session.fb_id;
+    let user = '';
+
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
 
     if (!fb_id) {
         return res.status(403).send('Forbidden: You must be logged in to edit a position');
@@ -177,7 +204,7 @@ router.get('/edit/position/:positionId', isAuthenticated, (req, res) => {
                     return res.status(500).send('Internal Server Error');
                 }
                 const tags = (tagRows || []).map(r => r.name);
-                res.render('edit', { type: 'position', position, company: company || null, tags });
+                res.render('edit', { type: 'position', position, company: company || null, tags, user });
             });
         });
     });

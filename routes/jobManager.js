@@ -230,7 +230,9 @@ router.post('/jobManager/accept', isAuthenticated, async (req, res) => {
         // Assign the applicant to the job and change status to 'in_progress'
         // ensure the applicant is not employed at another company
         const companyRow = company; // fetched above
-         
+        const existingEmployment = await new Promise((resolve, reject) => db.get('SELECT company_id FROM company_employees WHERE fb_id = ?', [applicantId], (e, r) => e ? reject(e) : resolve(r)));
+
+
         await new Promise((resolve, reject) => {
             db.run(
                 'UPDATE jobs SET employee_id = ?, status = ? WHERE id = ?',

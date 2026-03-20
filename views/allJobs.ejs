@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Jobs</title>
+    <title>All Contracts</title>
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/allJobs.css">
     <script defer src="/js/job.js"></script>
     <script defer src="/js/searchJobs.js"></script>
+    <link rel="icon" href="/icons/jobbar.png">
 </head>
 <body>
     <%- include("banner.ejs") %>
@@ -15,32 +16,43 @@
         <div class="nav-row">
             <input id="job-search-input" type="text" placeholder="Search..."/>
         </div>
-        
-        <h1 style="margin-top:1rem">All Open Contracts</h1>
-        <div class="jobs-list" style="max-width:1100px;margin:1rem auto;padding:0 1rem;">
+        <div class="jobs-list" style="max-width:1100px;padding:0 1rem;">
             <% if (jobs && jobs.length > 0) { %>
                 <% jobs.forEach(function(job){ %>
                     <article class="job-card">
                         <div class="job-title">
-                            <b><%= job.title %></b>
-                            <span style="color:#f7d2df;font-weight:700;margin-left:8px">@
-                                <a href="/job/<%= encodeURIComponent(job.company_name || job.company) %>" style="color:#f7d2df;text-decoration:underline">
+                            <strong><%= job.title %></strong>
+                            <br>
+                            <span>
+                                <a href="/job/<%= encodeURIComponent(job.company_name || job.company) %>">
                                     <%= job.company_name || job.company %>
                                 </a>
                             </span>
                         </div>
-                        <% if (job.company_description) { %>
-                            <div class="company-desc" style="color:#ddd;margin:0.4rem 0;font-size:0.95rem"><%= job.company_description %></div>
-                        <% } %>
                         <div class="job-desc"><%= job.description %></div>
-                        <div class="job-link"><a href="<%= job.link %>" target="_blank">View Issue</a></div>
-                        <div class="job-pay">Pay: <%= job.pay %></div>
-                        <div style="margin-top:0.6rem">
+                        <div class="job-link">
+                            <a href="<%= job.link %>" target="_blank">
+                                <img src="/icons/redirect.png" width="15" height="15">
+                                <div class="text">Visit Contract Source</div>
+                            </a>
+                        </div>
+                        <div class="job-pay">
+                            <div class="pay-cont">
+                                +
+                                <img src="/icons/cost.png" width="20" height="20">
+                                <div class="title-text"><%= Number(job.pay).toLocaleString().length > 30 ? Number(job.pay).toLocaleString().substring(0, 30) + '...' : Number(job.pay).toLocaleString() %> %></div>
+                            </div>
+                        </div>
+                        <div class="job-status" style="margin-top:0.6rem">
                             <% if (job.you_applied) { %>
-                                <span class="job-meta taken">You applied</span>
+                                <span class="job-meta taken">
+                                    You applied
+                                </span>
                             <% } else { %>
                                 <form action="/job/<%= job.id %>/apply" method="POST" style="display:inline">
-                                    <button type="submit" class="apply-btn">Apply</button>
+                                    <button type="submit" class="apply-btn">
+                                        Apply
+                                    </button>
                                 </form>
                             <% } %>
                         </div>

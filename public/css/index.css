@@ -1,9 +1,3 @@
-/* Dark-pink aesthetic for the index page
-   - Centers the hero area and the two buttons
-   - Responsive: buttons are side-by-side on wide screens and stacked on small screens
-   - Uses IDs `#freelance`, `#links` and class `.btn` from `views/index.ejs`
-*/
-
 :root{
   --bg-a: #2b0b1e; /* deep maroon */
   --bg-b: #61203a; /* muted plum */
@@ -23,6 +17,7 @@ body{
   background-position: center;
   background-repeat: no-repeat no-repeat;
   color:var(--muted);
+  user-select: none;
 }
 
 .bob{

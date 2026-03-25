@@ -7,6 +7,7 @@
   <title>Job Manager - <%= company.name %></title>
   <link rel="stylesheet" href="/css/index.css">
   <link rel="stylesheet" href="/css/job.css">
+  <link rel="stylesheet" href="/css/jobManager.css"
   <link rel="icon" href="/icons/jobbar.png">
 </head>
 
@@ -33,7 +34,10 @@
                 <div class="job-title"><b><%= job.title %></b></div>
                 <div class="job-desc"><%= job.description %></div>
                 <div class="job-link"><a href="<%= job.link %>" target="_blank">View Contracts</a></div>
-                <div class="job-pay">Pay: <%= job.pay %></div>
+                <div class="job-pay" style="display: flex; gap: 5px; align-items: center; justify-content: center;">
+                  +<img src="/icons/cost.png" width="20" height="20" style="filter: invert(1);">
+                  <div><%= job.pay %></div>
+                </div>
                 <div class="job-meta available">Available</div>
                 <button class="job-edit" onclick="location.href='/edit/job/<%= job.id %>'">Edit</button>
                 <% if (!job.status || (job.status !== 'in_progress' && job.status !== 'completed')) { %>
@@ -60,7 +64,10 @@
               <article class="job-card">
                 <div class="job-title"><b><%= job.title %></b></div>
                 <div class="job-desc"><%= job.description %></div>
-                <div class="job-pay">Pay: <%= job.pay %></div>
+                <div class="job-pay" style="display: flex; gap: 5px; align-items: center; justify-content: center;">
+                  +<img src="/icons/cost.png" width="20" height="20" style="filter: invert(1);">
+                  <div><%= job.pay %></div>
+                </div>
                 <div class="job-meta taken">
                   <%= job.applicants_count %> applicant(s)
                   <% if (job.applicants && job.applicants.length > 0) { %>
@@ -104,11 +111,15 @@
               <article class="job-card">
                 <div class="job-title"><b><%= job.title %></b></div>
                 <div class="job-desc"><%= job.description %></div>
-                <div class="job-pay">Pay: <%= job.pay %></div>
+                <div class="job-pay" style="display: flex; gap: 5px; align-items: center; justify-content: center;">
+                  +<img src="/icons/cost.png" width="20" height="20" style="filter: invert(1);">
+                  <div><%= job.pay %></div>
+                </div>
                 <div class="job-meta taken">
-                  Assigned to <%= job.employee_name %>
-                  <form action="/jobManager/fire/<%= job.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Fire this employee?');">
-                    <button type="submit" class="fire">🔥</button>
+                  <div>Assigned to <strong style="color: rgb(180, 67, 84);"><%= job.employee_name %></strong></div>
+                  <form class="fr" action="/jobManager/fire/<%= job.id %>" method="POST" style="display:inline; position: relative;" onsubmit="return confirm('Fire this employee?');">
+                    <button type="submit" style="margin-left: 10px;" class="fire">🔥</button>
+                    <div class="text">Fire</div>
                   </form>
                   <button class="complete-button" 
                     data-job-id="<%= job.id %>"
@@ -143,7 +154,10 @@
               <article class="job-card">
                 <div class="job-title"><b><%= job.title %></b></div>
                 <div class="job-desc"><%= job.description %></div>
-                <div class="job-pay">Pay: <%= job.pay %></div>
+                <div class="job-pay" style="display: flex; gap: 5px; align-items: center; justify-content: center;">
+                  +<img src="/icons/cost.png" width="20" height="20" style="filter: invert(1);">
+                  <div><%= job.pay %></div>
+                </div>
                 <div class="job-meta completed">Completed by <%= job.employee_name %></div>
                 <form method="POST" action="/jobManager/delete" style="display:inline;margin-left:8px;" onsubmit="return confirm('Delete this job? This cannot be undone.');">
                   <input type="hidden" name="jobId" value="<%= job.id %>">

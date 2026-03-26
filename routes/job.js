@@ -5,9 +5,18 @@ const isAuthenticated = require('../middleware/isAuthenticated');
 const { isGitHubIssueClosed } = require('../modules/github');
 
 // Route: show a single company and its jobs by company name (same EJS page)
-router.get('/job/:companyName', isAuthenticated, (req, res) => {
+router.get('/job/:companyName', isAuthenticated, async (req, res) => {
     const db = req.app.locals.db;
     const companyName = req.params.companyName; // express already decodes URL components
+    const fbId = req.session.fb_id;
+    let user = '';
+
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
 
     // get all companies (for navigation/listing)
     const companiesQuery = `SELECT * FROM companies`;
@@ -67,7 +76,7 @@ router.get('/job/:companyName', isAuthenticated, (req, res) => {
             const jobIds = (jobs || []).map(j => j.id).filter(Boolean);
             if (jobIds.length === 0) {
                 // no jobs, render directly
-                return res.render('job', { companies, company: selectedCompany, jobs, user: req.session.user, fb_id: req.session.fb_id });
+                return res.render('job', { companies, company: selectedCompany, jobs, user: req.session.user, fb_id: req.session.fb_id, user });
             }
 
             db.run(`CREATE TABLE IF NOT EXISTS job_applications (
@@ -87,7 +96,7 @@ router.get('/job/:companyName', isAuthenticated, (req, res) => {
                 db.all(`SELECT job_id, fb_id FROM job_applications WHERE job_id IN (${placeholders})`, jobIds, (aErr, appRows) => {
                     if (aErr) {
                         console.error('Error fetching applications:', aErr);
-                        return res.render('job', { companies, company: selectedCompany, jobs, user: req.session.user, fb_id: req.session.fb_id });
+                        return res.render('job', { companies, company: selectedCompany, jobs, user: req.session.user, fb_id: req.session.fb_id, user});
                     }
 
                     // build lookup maps
@@ -107,7 +116,7 @@ router.get('/job/:companyName', isAuthenticated, (req, res) => {
                         j.you_applied = youAppliedSet.has(jid);
                     });
 
-                    return res.render('job', { companies, company: selectedCompany, jobs, user: req.session.user, fb_id: req.session.fb_id });
+                    return res.render('job', { companies, company: selectedCompany, jobs, user: req.session.user, fb_id: req.session.fb_id, user });
                 });
             });
         });

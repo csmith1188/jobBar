@@ -20,15 +20,7 @@
     <link rel="icon" href="/icons/jobbar.png">
 </head>
 
-<body
-  style="
-  background: <%= company ? 'linear-gradient(180deg, ' + company.pColor + ', ' + company.sColor + ')' : 'transparent' %>;
-  color: <%= company.bpColor %>;
-  --pColor: <%= company.pColor %>;
-  --sColor: <%= company.sColor %>;
-  --bpColor: <%= company.bpColor %>;
-  --bsColor: <%= company.bsColor %>;
-  ">
+<body>
   <%- include("banner.ejs") %>
   <main class="jobs-container">
     <% 
@@ -41,19 +33,13 @@
     %>
     <div class="nav-row">
       <% if (canManage) { %>
-        <a class="small-btn" href="/ePost/<%= encodeURIComponent(company.name) %>">Create Position</a>
+        <a class="small-btn" href="/ePost/<%= encodeURIComponent(company.name) %>">+ Add Position</a>
           <button class="small-btn" onclick="location.href='<%= positionManagerUrl %>'">Manage Positions</button>
       <% } %>
       <input id="job-search-input" type="text" placeholder="Search jobs..." style="margin: 0;"/>
     </div>
 
-      <div class="jobs-header">
-        <h1>Company: <%= company ? company.name : 'Not found' %>
-        </h1>
-      </div>
-
     <section aria-labelledby="jobs-list">
-      <h2 id="jobs-list">Open positions</h2>
       <% 
         // Filter for available jobs (no employee assigned)
         const availableJobs = jobs ? jobs.filter(job => !job.employee_id) : [];

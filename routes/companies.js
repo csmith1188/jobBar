@@ -33,8 +33,7 @@ router.get('/companies', isAuthenticated, async (req, res) => {
             verified: Number(r.verified) || 0,
             isOwner: fb ? (String(r.owner_id) === fb) : false
         }));
-        const isManager = !!fb;
-        res.render('companies', { companies: normalized, user, fb_id: fb, isManager });
+        res.render('companies', { companies: normalized, user, fb_id: fb });
     });
 });
 

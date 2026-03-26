@@ -49,21 +49,20 @@ body{
 .btn{
   border:0;
   padding:0.85rem 1.6rem;
+  width: 150px;
   font-size:1rem;
   border-radius:999px;
   cursor:pointer;
-  transition:transform .18s ease, box-shadow .18s ease, opacity .12s ease;
+  transition: all 0.2s ease;
   box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+.btn:hover {
+  scale: 1.05;
 }
 
 .btn:active{transform:translateY(1px)}
 .btn:focus{outline:3px solid rgba(255,255,255,0.08); outline-offset:3px}
-
-.btn-primary{
-  background: linear-gradient(180deg,var(--accent) 0%, var(--accent-2) 100%);
-  color:#fff;
-  font-weight:600;
-}
 
 /* Make the buttons full-width on small screens */
 @media (max-width:520px){

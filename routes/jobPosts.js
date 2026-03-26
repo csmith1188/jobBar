@@ -3,9 +3,17 @@ const router = require('express').Router();
 const isAuthenticated = require('../middleware/isAuthenticated');
 
 // Show job posting form
-router.get('/jobPosts/:companyName', isAuthenticated, (req, res) => {
+router.get('/jobPosts/:companyName', isAuthenticated, async (req, res) => {
     const db = req.app.locals.db;
     const companyName = req.params.companyName;
+    const fbId = req.session.fb_id;
+    let user = '';
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
 
     db.get('SELECT * FROM companies WHERE name = ? COLLATE NOCASE', [companyName], (err, company) => {
         if (err) {
@@ -26,7 +34,8 @@ router.get('/jobPosts/:companyName', isAuthenticated, (req, res) => {
             company,
             fb_id: req.session.fb_id,
             error: null,
-            form: {}
+            form: {},
+            user
         });
     });
 });

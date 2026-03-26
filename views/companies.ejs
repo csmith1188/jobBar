@@ -33,15 +33,15 @@
                                 <a id="v" href="/home/<%= encodeURIComponent(company.name) %>">
                                     <img src="/icons/home.png" width="15" height="15">
                                     <div class="text">Home</div></a>
-                                <a id="v" href="<%= company.link %>" target="_blank" >
-                                    <img src="/icons/redirect.png" width="15" height="15">
-                                    <div class="text">Visit Site</div></a>
                                 <a id="i" href="/Job/<%= encodeURIComponent(company.name) %>"> 
                                     <img src="/icons/issue.png" width="15" height="15">
-                                    <div class="text">Issues</div></a>
+                                    <div class="text">Contracts</div></a>
                                 <a id="p" href="/eJob/<%= encodeURIComponent(company.name) %>">
                                     <img src="/icons/position.png" width="15" height="15">
                                     <div class="text">Positions</div></a>
+                                <a id="v" href="<%= company.link %>" target="_blank" >
+                                    <img src="/icons/redirect.png" width="15" height="15">
+                                    <div class="text">Visit Site</div></a>
                             </div>
                             <% if (company.isOwner) { %>
                                     <a id="dlt">

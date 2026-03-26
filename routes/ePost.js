@@ -3,9 +3,17 @@ const router = require('express').Router();
 const isAuthenticated = require('../middleware/isAuthenticated');
 
 // GET /ePost/:companyName - render a form for company owners to create a new position
-router.get('/ePost/:companyName', isAuthenticated, (req, res) => {
+router.get('/ePost/:companyName', isAuthenticated, async (req, res) => {
   const db = req.app.locals.db;
   const { companyName } = req.params;
+  const fbId = req.session.fb_id;
+  let user = '';
+  try {
+      user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+      if (!user) return res.status(404).send('User not found');
+  } catch (err) {
+      console.log(err);
+  }
 
   db.get('SELECT * FROM companies WHERE name = ? COLLATE NOCASE', [companyName], (err, companyRow) => {
     if (err) {
@@ -18,7 +26,7 @@ router.get('/ePost/:companyName', isAuthenticated, (req, res) => {
     const ownerFb = companyRow.owner_id !== undefined && companyRow.owner_id !== null ? String(companyRow.owner_id) : null;
     if (!requesterFb || requesterFb !== ownerFb) return res.redirect('/companies');
 
-    res.render('ePost', { company: companyRow });
+    res.render('ePost', { company: companyRow, user });
   });
 });
 
@@ -26,6 +34,14 @@ router.get('/ePost/:companyName', isAuthenticated, (req, res) => {
 router.post('/ePost', isAuthenticated, async (req, res) => {
   const db = req.app.locals.db;
   const body = req.body || {};
+  const fbId = req.session.fb_id;
+  let user = '';
+  try {
+      user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+      if (!user) return res.status(404).send('User not found');
+  } catch (err) {
+      console.log(err);
+  }
 
   // Manager check
   if (!res.locals || !res.locals.isManager) {

@@ -22,7 +22,8 @@
 
                 <div style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;">
                     <div><strong>Owner:</strong> <%= owner ? (owner.username || owner.fb_id) : 'Unknown' %></div>
-                    <div><strong>Employees:</strong> <% if (employees && employees.length > 0) { %>
+                    <div><strong>Employees:</strong> 
+                    <% if (employees && employees.length > 0) { %>
                         <span><%= employees.map(e => e.username || e.fb_id).join(', ') %></span>
                     <% } else { %>
                         <span>None</span>

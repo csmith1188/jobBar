@@ -1,37 +1,78 @@
 <link rel="stylesheet" href="/css/banner.css">
 <header class="topHead">
+    <% 
+    let canManage = false;
+    if (typeof company !== 'undefined' && company) {
+        const ownerId = company && (company.owner_id !== undefined && company.owner_id !== null) ? String(company.owner_id) : null;
+        const requesterId = typeof fb_id !== 'undefined' && fb_id !== null ? String(fb_id) : null;
+        canManage = requesterId && ownerId && requesterId === ownerId;
+    }
+    %>
     <div class="contain">
         <div class="offset">
             <div class="title">
-                <img src="/icons/jobbar.png" width="38" height="38">
-                <div>
+                <img src="/icons/jobbar.png" width="38" height="38" style="cursor: pointer;" title="Homepage" onclick="location.href='/'">
+                <div id="directs">
                     <% if (typeof fb_id !== 'undefined' && fb_id) { %>
-                        <strong class="proftxt" onclick="location.href='/profile'"
+                        <div id="dir-row" style="display: flex; flex-direction: row; align-items: center; gap: 6px;"
                         data-match="/companies,/Job,/eJob,/jobPosts,/jobManager,/ePost,/home,/positionManager,/edit">
-                            <%= user && user.username ? user.username : 'Guest' %>
-                            <%= (typeof company !== 'undefined' && company.name) ? ` / ${company.name}` : '' %>
-                                    <span id="page-type"></span>
-                        </strong>
+                            <button class="proftxt" onclick="location.href='/profile'">
+                                <%= user && user.username ? user.username : 'Guest' %>
+                            </button>
+                            <% if (typeof company !== 'undefined' && company.name) { %>
+                                <div class="vL" style="color: gray;">|</div>
+                                    <button class="proftxt" onclick="location.href='/home/<%= encodeURIComponent(company.name) %>'">
+                                        <div style="display: flex; flex-direction: row; gap: 8px; align-items: center;">
+                                            <div><%= company.name %></div>
+                                            <img style="filter: invert(1);" src="/icons/banner/root.png" width="13" height="13">
+                                        </div>
+                                    </button>
+                            <% } %>
+                                <span id="page-type"></span>
+                        </div>
                     <% } %>
                 </div>
             </div>
             <div class="intC">
+                <% if (typeof company !== 'undefined' && company.name) { %>
+                    <div class="buttonsCont">
+                        <button class="redir" data-path="/home" onclick="location.href='/home/<%= encodeURIComponent(company.name) %>'">
+                            <img src="/icons/home.png" alt="Home" width="18" height="18">
+                            <div>Home</div>
+                        </button>
+                        <button class="redir" data-path="/eJob" onclick="location.href='/eJob/<%= encodeURIComponent(company.name) %>'">
+                            <img src="/icons/banner/company.png" alt="Positions" width="18" height="18">
+                            <div>Positions</div>
+                        </button>
+                        <button class="redir" data-path="/Job" onclick="location.href='/Job/<%= encodeURIComponent(company.name) %>'">
+                            <img src="/icons/banner/issue.png" alt="Contracts" width="20" height="20">
+                            <div>Contracts</div>
+                        </button>
+                    <% if (typeof canManage !== 'undefined' && canManage) { %>
+                        <button class="redir" data-path="/edit" onclick="location.href='/edit/company/<%= company.id %>'">
+                            <img src="/icons/banner/create.png" alt="Edit" width="18" height="18">
+                            <div>Edit</div>
+                        </button>
+                    <% } %>
+                </div>
+                <% } else { %>
                 <div class="buttonsCont">
-                    <button class="redir" data-path="/allJobs" onclick="location.href='/allJobs'">
-                        <img src="/icons/banner/issue.png" alt="All Issues" width="20" height="20">
-                        <div>All Contracts</div>
-                    </button>
                     <button class="redir" data-path="/companies" onclick="location.href='/companies'">
                         <img src="/icons/banner/company.png" alt="Companies" width="18" height="18">
                         <div>Companies</div>
                     </button>
+                    <button class="redir" data-path="/allJobs" onclick="location.href='/allJobs'">
+                        <img src="/icons/banner/issue.png" alt="All Issues" width="20" height="20">
+                        <div>Contracts</div>
+                    </button>
                     <% if (isManager) { %>
                         <button class="redir" data-path="/post" onclick="location.href='/post'">
                             <img src="/icons/banner/create.png" alt="Create a Company" width="18" height="18">
-                            <div>Create a Company</div>
+                            <div>Create Company</div>
                         </button>
                     <% } %>
                 </div>
+                <% } %>
             </div>
         </div>
     </div>
@@ -55,27 +96,41 @@
         });
     });
     const path = window.location.pathname;
-    const pageTypeEl = document.getElementById('page-type');
+    const pageTypeEl = document.getElementById('directs');
     const button = document.createElement('button');
-    button.classList.add("redir");
+    button.classList.add("proftxt");
 
     if (path.includes('/eJob/')) {
-        button.textContent = ' / Positions';
+        button.textContent = 'Positions';
+        ab(button);
     } else if (path.includes('/Job/')) {
-        button.textContent = ' / Issues';
+        button.textContent = 'Contracts';
+        ab(button);
     } else if (path.includes('jobPosts')) {
-        button.textContent = ' / Post Issue';
+        button.textContent = 'Post Issue';
+        ab(button);
     } else if (path.includes('/jobManager')) {
-        button.textContent = ' / Manage Issues';
+        button.textContent = 'Manage Contracts';
+        ab(button);
     } else if (path.includes('/ePost')) {
-        button.textContent = ' / Create Position';
+        button.textContent = 'Create Position';
+        ab(button);
     } else if (path.includes('/positionManager')) {
-        button.textContent = ' / Manage Positions';
+        button.textContent = 'Manage Positions';
+        ab(button);
     } else if (path.includes('/edit')) {
-        button.textContent = ' / Edit';
+        button.textContent = 'Edit Company';
+        ab(button);
     }
 
-    if (pageTypeEl) {
-        pageTypeEl.appendChild(button)
+    function ab(button) {
+        if (pageTypeEl) {
+            const slash = document.createElement('div');
+            slash.textContent = '|';
+            slash.style.color = 'gray';
+            slash.classList.add("vL");
+            pageTypeEl.appendChild(slash);
+            pageTypeEl.appendChild(button);
+        }
     }
 </script>

@@ -4,9 +4,17 @@ const isAuthenticated = require('../middleware/isAuthenticated');
 const { isGitHubIssueClosed } = require('../modules/github');
 
  // Route: show a single company and its jobs by company name (same EJS page)
-router.get('/jobManager/:companyName', isAuthenticated, (req, res) => {
+router.get('/jobManager/:companyName', isAuthenticated, async (req, res) => {
+    const fbId = req.session.fb_id;
     const db = req.app.locals.db;
     const companyName = req.params.companyName;
+    let user = '';
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
 
     // Get company details
     db.get('SELECT * FROM companies WHERE name = ? COLLATE NOCASE', [companyName], (err, company) => {
@@ -181,7 +189,8 @@ router.get('/jobManager/:companyName', isAuthenticated, (req, res) => {
                     company, 
                     jobs: jobsWithApplicants, 
                     fb_id: req.session.fb_id,
-                    message
+                    message, 
+                    user
                 });
             });
         });

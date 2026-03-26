@@ -3,9 +3,18 @@ const router = require('express').Router();
 const isAuthenticated = require('../middleware/isAuthenticated');
 
 // Render company-specific employment positions page (eJob.ejs)
-router.get('/eJob/:companyName', isAuthenticated, (req, res) => {
+router.get('/eJob/:companyName', isAuthenticated, async (req, res) => {
     const db = req.app.locals.db;
     const companyName = req.params.companyName;
+    const fbId = req.session.fb_id;
+    let user = '';
+
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
 
     db.get('SELECT * FROM companies WHERE name = ? COLLATE NOCASE', [companyName], (err, company) => {
         if (err) {
@@ -23,7 +32,7 @@ router.get('/eJob/:companyName', isAuthenticated, (req, res) => {
 
             const jobIds = (jobs || []).map(j => j.id).filter(Boolean);
             if (jobIds.length === 0) {
-                return res.render('eJob', { company, jobs: jobs || [], fb_id: req.session && req.session.fb_id ? req.session.fb_id : null });
+                return res.render('eJob', { company, jobs: jobs || [], fb_id: req.session && req.session.fb_id ? req.session.fb_id : null, user });
             }
 
             const placeholders = jobIds.map(() => '?').join(',');
@@ -50,7 +59,7 @@ router.get('/eJob/:companyName', isAuthenticated, (req, res) => {
 
                 // Attach tags for these jobs (positions)
                 const ph = placeholders; // reuse placeholders built above
-                db.all(`SELECT pt.position_id, t.name FROM position_tags pt JOIN tags t ON pt.tag_id = t.id WHERE pt.position_id IN (${ph})`, jobIds, (tErr, tRows) => {
+                db.all(`SELECT pt.position_id, t.name FROM position_tags pt JOIN tags t ON pt.tag_id = t.id WHERE pt.position_id IN (${ph})`, jobIds, async (tErr, tRows) => {
                     const tagMap = {};
                     if (!tErr && Array.isArray(tRows)) {
                         tRows.forEach(r => {
@@ -62,11 +71,11 @@ router.get('/eJob/:companyName', isAuthenticated, (req, res) => {
                     // also check if current user is employed anywhere
                     const fb = req.session && req.session.fb_id ? String(req.session.fb_id) : null;
                     if (!fb) {
-                        return res.render('eJob', { company, jobs: jobs || [], fb_id: fb, isEmployed: false });
+                        return res.render('eJob', { company, jobs: jobs || [], fb_id: fb, isEmployed: false, user });
                     }
                     db.get('SELECT company_id FROM company_employees WHERE fb_id = ?', [fb], (eEmp, empRow) => {
                         const isEmployed = !!(empRow && empRow.company_id);
-                        return res.render('eJob', { company, jobs: jobs || [], fb_id: fb, isEmployed });
+                        return res.render('eJob', { company, jobs: jobs || [], fb_id: fb, isEmployed, user });
                     });
                 });
             });

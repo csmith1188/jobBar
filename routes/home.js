@@ -11,8 +11,17 @@ const db = new sqlite3.Database(dbFile, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CR
 });
 
 // Per-company home page: shows company info, owner, employees and counts for open jobs/positions
-router.get('/home/:companyName', isAuthenticated, (req, res) => {
+router.get('/home/:companyName', isAuthenticated, async (req, res) => {
     const companyName = req.params.companyName; // express decodes URL parts
+    const fbId = req.session.fb_id;
+    let user = '';
+
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
 
     // Fetch all companies for the header/listing (keeps parity with other pages)
     db.all('SELECT * FROM companies ORDER BY id DESC', [], (cErr, companies) => {
@@ -63,7 +72,8 @@ router.get('/home/:companyName', isAuthenticated, (req, res) => {
                             employees: employees || [],
                             openJobsCount: (jobCountRow && jobCountRow.openJobs) || 0,
                             openPositionsCount: (posCountRow && posCountRow.openPositions) || 0,
-                            fb_id: req.session && req.session.fb_id
+                            fb_id: req.session && req.session.fb_id,
+                            user
                         });
                     });
                 });

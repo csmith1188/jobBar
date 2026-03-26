@@ -22,8 +22,13 @@
     gap: 10px;
 }
 
+.topHead #directs {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 .title .proftxt {
-    padding:0.6rem 0.5rem;
     border-radius:8px;
     border:none;
     height: 35px;
@@ -37,6 +42,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.title .vL {
+    font-size: 0.9em;
+    transform: rotate(20deg);
 }
 
 .title .proftxt:hover {

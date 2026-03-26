@@ -3,9 +3,17 @@ const router = require('express').Router();
 const isAuthenticated = require('../middleware/isAuthenticated');
 
 // Manage company positions (employment)
-router.get('/positionManager/:companyName', isAuthenticated, (req, res) => {
+router.get('/positionManager/:companyName', isAuthenticated, async (req, res) => {
   const db = req.app.locals.db;
   const companyName = req.params.companyName;
+  const fbId = req.session.fb_id;
+  let user = '';
+  try {
+      user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+      if (!user) return res.status(404).send('User not found');
+  } catch (err) {
+      console.log(err);
+  }
 
   db.get('SELECT * FROM companies WHERE name = ? COLLATE NOCASE', [companyName], (err, company) => {
     if (err) { console.error('Database error:', err); return res.status(500).send('Internal Server Error'); }
@@ -100,7 +108,7 @@ router.get('/positionManager/:companyName', isAuthenticated, (req, res) => {
         if (pIds.length === 0) {
           (positionsWithApplicants || []).forEach(p => p.tags = []);
           const message = req.query && req.query.error ? String(req.query.error) : null;
-          return res.render('positionManager', { company, positions: positionsWithApplicants, fb_id: req.session.fb_id, message });
+          return res.render('positionManager', { company, positions: positionsWithApplicants, fb_id: req.session.fb_id, message, user });
         }
         const ph = pIds.map(() => '?').join(',');
         db.all(`SELECT pt.position_id, t.name FROM position_tags pt JOIN tags t ON pt.tag_id = t.id WHERE pt.position_id IN (${ph})`, pIds, (tErr, tRows) => {
@@ -110,7 +118,7 @@ router.get('/positionManager/:companyName', isAuthenticated, (req, res) => {
           }
           positionsWithApplicants.forEach(p => { p.tags = tagMap[p.id] || []; });
           const message = req.query && req.query.error ? String(req.query.error) : null;
-          res.render('positionManager', { company, positions: positionsWithApplicants, fb_id: req.session.fb_id, message });
+          res.render('positionManager', { company, positions: positionsWithApplicants, fb_id: req.session.fb_id, message, user });
         });
       });
     });

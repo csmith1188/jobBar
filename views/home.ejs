@@ -11,25 +11,42 @@
 </head>
 <body>
         <%- include("banner.ejs") %>
-        <main class="home-main">
+        <main class="home-main" style="display: flex; align-items: center; justify-content: center;"
+        >
             <% const ownerId = company && (company.owner_id !== undefined && company.owner_id !== null) ? String(company.owner_id) : null; %>
             <% const requesterId = typeof fb_id !== 'undefined' && fb_id !== null ? String(fb_id) : null; %>
             <% const canManage = requesterId && ownerId && requesterId === ownerId; %>
 
-            <section class="company-hero" style="padding:1rem;margin:0 1rem;border-radius:8px;background:rgba(255,255,255,0.04);">
-                <h1 style="margin:0 0 0.5rem 0;"><%= company ? company.name : 'Company' %></h1>
+            <section class="company-hero" style="width: 80%; padding:1rem;margin:0 1rem;border-radius:8px;background:rgba(255,255,255,0.04);">
+                <div class="title" style="display: flex; align-items: center; gap: 15px">
+                    <h1 style="margin:0 0 0.5rem 0;"><%= company ? company.name : 'Company' %></h1>
+                    <div class="employees" style="padding: 7px 12px 7px 12px; background-color: rgb(180, 67, 84);">
+                        <div class="imgC">
+                            <img src="/icons/owner.png" width="15" height="15" style="filter: invert(1)">
+                        </div> 
+                        <strong style="font-size: 15px;"><%= owner ? (owner.username || owner.fb_id) : 'Unknown' %></strong>
+                    </div>
+                </div>
                 <p style="margin:0 0 0.6rem 0;"><%= company && company.description ? company.description : 'No description provided.' %></p>
 
                 <div style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;">
-                    <div><strong>Owner:</strong> <%= owner ? (owner.username || owner.fb_id) : 'Unknown' %></div>
-                    <div><strong>Employees:</strong> 
+                    <div class="employees">
+                        <div class="imgC">
+                            <img src="/icons/position.png" width="20" height="20" style="filter: invert(1)">
+                        </div>
+                    <div class="listOE">
                     <% if (employees && employees.length > 0) { %>
-                        <span><%= employees.map(e => e.username || e.fb_id).join(', ') %></span>
+                        <% for (let i = 0; i < Math.min(employees.length, 5); i++) { %>
+                        <div class="econt">
+                            <div class="employ"><%= employees[i].username.charAt(0) %></div>
+                            <div class="text"><%= employees[i].username %></div>
+                        </div>
+                        <% } %>
                     <% } else { %>
-                        <span>None</span>
-                    <% } %></div>
-                    <div><strong>Open Contracts:</strong> <%= typeof openJobsCount !== 'undefined' ? openJobsCount : 0 %></div>
-                    <div><strong>Open Positions:</strong> <%= typeof openPositionsCount !== 'undefined' ? openPositionsCount : 0 %></div>
+                        <div>None</div>
+                    <% } %>
+                        </div>
+                    </div>
                 </div>
             </section>
 

@@ -34,6 +34,7 @@ router.get('/edit/company/:companyId', isAuthenticated, async (req, res) => {
 router.post('/edit/company/:companyId', isAuthenticated, (req, res) => {
     const db = req.app.locals.db;
     const fb_id = req.session.fb_id;
+    const companyId = req.params.companyId;
     if (!fb_id) {
         return res.status(403).send('Forbidden: You must be logged in to edit a company');
     }
@@ -41,10 +42,13 @@ router.post('/edit/company/:companyId', isAuthenticated, (req, res) => {
     if (!name || !description || !link || !pColor || !sColor) {
         return res.status(400).send('All fields are required.');
     }
-    const query = `UPDATE companies SET name = ?, description = ?, link = ?, pColor = ?, sColor = ? WHERE owner_id = ? COLLATE NOCASE`;
-    db.run(query, [name, description, link, pColor, sColor, fb_id], function(err) {
+    const query = `UPDATE companies SET name = ?, description = ?, link = ?, pColor = ?, sColor = ? WHERE id = ? AND owner_id = ? COLLATE NOCASE`;
+    db.run(query, [name, description, link, pColor, sColor, companyId, fb_id], function(err) {
         if (err) {
             return res.status(500).send('Internal Server Error');
+        }
+        if (this.changes === 0) {
+            return res.status(404).send('Company not found or you do not have permission to edit it.');
         }
         res.redirect('/jobManager/' + encodeURIComponent(name));
     });
@@ -217,7 +221,7 @@ router.post('/edit/position/:positionId', isAuthenticated, (req, res) => {
 
     if (!fb_id) return res.status(403).send('Forbidden: You must be logged in to edit a position');
 
-    const { title, description, link } = req.body;
+    const { title, description } = req.body;
     if (!title || !description) return res.status(400).send('Title and description are required.');
 
     db.get('SELECT p.*, c.owner_id, c.name AS company_name FROM company_positions p LEFT JOIN companies c ON p.company_id = c.id WHERE p.id = ?', [positionId], (err, position) => {
@@ -237,8 +241,8 @@ router.post('/edit/position/:positionId', isAuthenticated, (req, res) => {
             return res.redirect('/positionManager/' + encodeURIComponent(companyName) + '?error=' + encodeURIComponent('Too late to edit this position.'));
         }
 
-        const updateQuery = 'UPDATE company_positions SET title = ?, description = ?, link = ? WHERE id = ?';
-        db.run(updateQuery, [title, description, link || '', positionId], function(updateErr) {
+        const updateQuery = 'UPDATE company_positions SET title = ?, description = ? WHERE id = ?';
+        db.run(updateQuery, [title, description, positionId], function(updateErr) {
             if (updateErr) {
                 console.error('Database error updating position:', updateErr);
                 return res.status(500).send('Internal Server Error');

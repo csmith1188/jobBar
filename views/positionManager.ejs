@@ -7,6 +7,7 @@
   <title>Position Manager - <%= company.name %></title>
   <link rel="stylesheet" href="/css/index.css">
   <link rel="stylesheet" href="/css/job.css">
+  <link rel="stylesheet" href="/css/jobManager.css">
   <link rel="icon" href="/icons/jobbar.png">
 </head>
 
@@ -27,7 +28,7 @@
         <div class="jobs-scroll">
           <% if (positions && positions.length > 0) { %>
             <% positions.filter(pos => !pos.employee_id && !pos.has_applications).forEach(function(pos){ %>
-              <article class="job-card">
+              <article class="job-card available" style="position: relative;">
                 <div class="job-title"><b><%= pos.title %></b></div>
                 <div class="job-desc"><%= pos.description %></div>
                 <% if (pos.tags && pos.tags.length) { %>
@@ -38,11 +39,19 @@
                   </div>
                 <% } %>
                 
-                <div class="job-meta available">Available</div>
-                <button class="job-edit" onclick="location.href='/edit/position/<%= pos.id %>'">Edit</button>
-                <form action="/positionManager/delete" method="POST" style="display:inline;margin-left:8px;" onsubmit="return confirm('Delete this position? This will remove all applications and uploaded files for the position.');">
+                <div class="job-meta available" style="margin-top: 5px;">Available</div>
+                <form class="delf" action="/positionManager/delete" method="POST" style="display:flex; align-items: center;" onsubmit="return confirm('Delete this position? This will remove all applications and uploaded files for the position.');">
                   <input type="hidden" name="positionId" value="<%= pos.id %>">
-                  <button type="submit" class="delete">Delete</button>
+                  <div class="jec">
+                    <button class="jedit" style="right: 0px;" type="button" onclick="location.href='/edit/position/<%= pos.id %>'">
+                      <img style="filter: invert(1)" src="/icons/edit.png" width="20" height="20">
+                      <div class="text">Edit Position</div>
+                    </button>
+                  </div>
+                  <button type="submit" class="delete-job">
+                    <img src="/icons/trash.png" width="20" height="20">
+                    <div class="text">Delete Position</div>
+                  </button>
                 </form>
               </article>
             <% }) %>
@@ -58,7 +67,7 @@
         <div class="jobs-scroll">
           <% if (positions && positions.length > 0) { %>
             <% positions.filter(pos => pos.has_applications && !pos.employee_id).forEach(function(pos){ %>
-              <article class="job-card">
+              <article class="job-card applied">
                 <div class="job-title"><b><%= pos.title %></b></div>
                 <div class="job-desc"><%= pos.description %></div>
                 <% if (pos.tags && pos.tags.length) { %>
@@ -70,18 +79,20 @@
                 <% } %>
                 
                 <div class="job-meta taken">
-                  <%= pos.applicants_count %> applicant(s)
                   <% if (pos.applicants && pos.applicants.length > 0) { %>
                       <ul class="applicants-list">
                         <% pos.applicants.forEach(applicant => { %>
-                          <li class="applicant-item">
+                          <li class="applicant-item" style="border-radius: 12px;">
                             <div class="applicant-row">
                               <button class="applicant-toggle" aria-expanded="false" title="Show files">▾</button>
                               <span class="applicant-name"><%= applicant.name %></span>
                               <form action="/positionManager/accept" method="POST" style="display:inline;margin-left:8px;" onsubmit="return confirm('Accept this applicant for the position?');">
                                 <input type="hidden" name="positionId" value="<%= pos.id %>">
                                 <input type="hidden" name="applicantId" value="<%= applicant.fb_id %>">
-                                <button type="submit" class="accept">Accept</button>
+                                <div class="comc">
+                                  <button type="submit" class="complete-button">✓</button>
+                                  <div class="text">Accept</div>
+                                </div>
                               </form>
                             </div>
 
@@ -91,11 +102,11 @@
                                   <% const ext = (file.original_name || '').split('.').pop().toLowerCase(); %>
                                   <div class="file-entry">
                                     <% if (file.field === 'resume') { %>
-                                      <div class="file-label">Resume:</div>
+                                      <div class="file-label">Resume</div>
                                     <% } else if (file.field === 'cover_letter') { %>
-                                      <div class="file-label">Cover Letter:</div>
+                                      <div class="file-label">Cover Letter</div>
                                     <% } else if (file.field === 'portfolio') { %>
-                                      <div class="file-label">Portfolio:</div>
+                                      <div class="file-label">Portfolio</div>
                                     <% } else { %>
                                       <div class="file-label"><%= (file.field || 'File').replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase()) %>:</div>
                                     <% } %>
@@ -123,10 +134,18 @@
                       </ul>
                   <% } %>
                 </div>
-                <button class="job-edit" onclick="location.href='/edit/position/<%= pos.id %>'">Edit</button>
-                <form action="/positionManager/delete" method="POST" style="display:inline;margin-left:8px;" onsubmit="return confirm('Delete this position? This will remove all applications and uploaded files for the position.');">
+                <form class="delf" action="/positionManager/delete" method="POST" style="display:flex; align-items: center;" onsubmit="return confirm('Delete this position? This will remove all applications and uploaded files for the position.');">
                   <input type="hidden" name="positionId" value="<%= pos.id %>">
-                  <button type="submit" class="delete">Delete</button>
+                  <div class="jec">
+                    <button class="jedit" style="right: 0px;" type="button" onclick="location.href='/edit/position/<%= pos.id %>'">
+                      <img style="filter: invert(1)" src="/icons/edit.png" width="20" height="20">
+                      <div class="text">Edit Position</div>
+                    </button>
+                  </div>
+                  <button type="submit" class="delete-job">
+                    <img src="/icons/trash.png" width="20" height="20">
+                    <div class="text">Delete Position</div>
+                  </button>
                 </form>
               </article>
             <% }) %>
@@ -142,7 +161,7 @@
         <div class="jobs-scroll">
           <% if (positions && positions.length > 0) { %>
             <% positions.filter(pos => pos.employee_id).forEach(function(pos){ %>
-              <article class="job-card">
+              <article class="job-card employee">
                 <div class="job-title"><b><%= pos.title %></b></div>
                 <div class="job-desc"><%= pos.description %></div>
                 <% if (pos.tags && pos.tags.length) { %>
@@ -155,14 +174,18 @@
                 
                 <div class="job-meta taken">
                   Assigned to <%= pos.employee_name %>
-                  <form action="/positionManager/fire/<%= pos.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Fire this employee?');">
-                    <button type="submit" class="fire">Fire</button>
+                  <form class="fr" action="/positionManager/fire/<%= pos.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Fire this employee?');">
+                    <button type="submit" style="margin-left: 10px;" class="fire">🔥</button>
+                    <div class="text">Fire Worker</div>
                   </form>
-                  <form action="/positionManager/delete" method="POST" style="display:inline;margin-left:8px;" onsubmit="return confirm('Delete this position? This will remove all applications and uploaded files for the position.');">
-                  <input type="hidden" name="positionId" value="<%= pos.id %>">
-                  <button type="submit" class="delete">Delete</button>
-                </form>
                 </div>
+                <form class="delf" action="/positionManager/delete" method="POST" style="display:flex;" onsubmit="return confirm('Delete this position? This will remove all applications and uploaded files for the position.');">
+                    <input type="hidden" name="positionId" value="<%= pos.id %>">
+                    <button type="submit" class="delete-job">
+                      <img src="/icons/trash.png" width="20" height="20">
+                      <div class="text">Delete Position</div>
+                    </button>
+                  </form>
               </article>
             <% }) %>
           <% } else { %>
@@ -180,7 +203,7 @@
 
   <style>
     .applicants-list { list-style: none; padding-left: 0; margin: 0; }
-    .applicant-item { margin: 0.6rem 0; border-bottom: 1px dashed rgba(255,255,255,0.06); padding-bottom:0.6rem; }
+    .applicant-item { margin: 0.6rem 0; padding-bottom:0.6rem; }
     .applicant-row { display:flex; align-items:center; gap:8px; }
     .applicant-toggle { 
       background: rgba(255,255,255,0.02); 

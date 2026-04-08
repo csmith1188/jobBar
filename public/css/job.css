@@ -125,7 +125,7 @@ input#job-search-input{
     transition:transform .12s ease, box-shadow .12s ease;
     position: relative;
 }
-.job-card:hover{
+.job-card:not(.available, .applied, .employee, .ip, .completed):hover{
     transform:translateY(-6px);
     box-shadow:0 10px 30px rgba(0,0,0,0.45);
 }
@@ -382,3 +382,16 @@ input#job-search-input{
 .pin-actions button{ padding:0.45rem 0.8rem; border-radius:8px; border:none; cursor:pointer }
 #pin-cancel{ background: transparent; color: var(--muted, #f3e9ef); border: 1px solid rgba(255,255,255,0.06); }
 #pin-confirm{ background: var(--accent, #c81f66); color: #fff; }
+
+.file-preview-trigger {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--muted);
+    padding: 4px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}

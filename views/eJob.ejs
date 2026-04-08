@@ -51,8 +51,8 @@
         <div class="jobs-grid">
           <% availableJobs.forEach(function(job){ %>
             <article class="job-card" role="article">
-              <div class="job-title"><b>Job Title:</b> <%= job.title %></div>
-              <div class="job-desc"><b>Description:</b> <%= job.description %></div>
+              <div class="job-title"><%= job.title %></div>
+              <div class="job-desc" style="overflow-x: hidden;"><%= job.description %></div>
               <% if (job.tags && job.tags.length) { %>
                 <div class="job-tags">
                   <% job.tags.forEach(function(tag){ %>

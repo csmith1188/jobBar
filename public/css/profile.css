@@ -238,8 +238,8 @@ body{
     position: absolute;
     right: 0;
     transform: translateX(-50%);
-    background-color: rgba(36, 37, 43, 0.658);
-    color: var(--muted);
+    background-color: white;
+    color: black;
     padding: 5px 8px;
     border-radius: 4px;
     font-size: 0.8em;
@@ -257,7 +257,11 @@ body{
     right: 210%;
 }
 
-.accComp .compBtnsCont a, .transfer-btn {
+.accComp .compBtnsCont #dlt .tooltip {
+    right: 310%;
+}
+
+.accComp .compBtnsCont a, .transfer-btn, .delete-company-btn {
     text-decoration: none;
     background: white;
     padding: 8px 8px 8px 8px;
@@ -270,11 +274,11 @@ body{
     border: none;
 }
 
-.accComp .compBtnsCont a:hover, .transfer-btn:hover {
+.accComp .compBtnsCont a:hover, .transfer-btn:hover, .delete-company-btn:hover {
     scale: 1.05;
 }
 
-.accComp .compBtnsCont a:active, .transfer-btn:active {
+.accComp .compBtnsCont a:active, .transfer-btn:active, .delete-company-btn:active {
     scale: 0.95;
 }
 
@@ -304,6 +308,15 @@ body{
 
 .accComp .compBtnsCont .transfer-btn img {
     filter: brightness(0) saturate(100%) invert(63%) sepia(18%) saturate(399%) hue-rotate(92deg) brightness(189%) contrast(90%);
+}
+
+.accComp .compBtnsCont .delete-company-btn {
+    background: rgb(119, 21, 21);
+    color: rgb(255, 210, 202);
+}
+
+.accComp .compBtnsCont .delete-company-btn img {
+    filter: brightness(111%);
 }
 
 .accPos {

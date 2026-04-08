@@ -86,6 +86,10 @@
                             <div class="applicant-row">
                               <button class="applicant-toggle" aria-expanded="false" title="Show files">▾</button>
                               <span class="applicant-name"><%= applicant.name %></span>
+                              <div style="display: flex; align-items: center; gap: 3px;">
+                                <img src="/icons/fid.png" height="10" width="10" style="filter: invert(1)">
+                                <div style="color: gray; font-size: 0.7em;"><%= applicant.fb_id %></div>
+                              </div>
                               <form action="/positionManager/accept" method="POST" style="display:inline;margin-left:8px;" onsubmit="return confirm('Accept this applicant for the position?');">
                                 <input type="hidden" name="positionId" value="<%= pos.id %>">
                                 <input type="hidden" name="applicantId" value="<%= applicant.fb_id %>">

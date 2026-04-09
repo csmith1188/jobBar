@@ -78,7 +78,7 @@ nav.top-controls button:hover{
   align-items:baseline
 }
 label{font-weight:600;color:(--bpColor)}
-input[type="text"], input[type="url"], textarea{
+input[type="text"], input[type="url"], input[type="number"], textarea{
   width:100%;
   padding:0.7rem 0.9rem;
   border-radius:8px;
@@ -250,4 +250,40 @@ button[type="submit"]:hover{
 
 #pin-confirm:hover {
   scale: 1.05;
+}
+
+#description {
+  max-height: 300px;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial !important;
+}
+
+#add-tag {
+    background: rgb(180, 67, 84);
+    border: none;
+    color: rgb(237, 255, 231);
+    padding: 6px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#add-tag:hover {
+    scale: 1.05;
+}
+
+.headt {
+  font-size: 1.1em;
+}
+
+input[type="file"]::file-selector-button {
+  background-color: var(--accent-2); /* Green background */
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: var(--accent-2); /* Darker green on hover */
 }

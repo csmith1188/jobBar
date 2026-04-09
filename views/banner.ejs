@@ -15,7 +15,7 @@
                 <div id="directs">
                     <% if (typeof fb_id !== 'undefined' && fb_id) { %>
                         <div id="dir-row" style="display: flex; flex-direction: row; align-items: center; gap: 6px;"
-                        data-match="/companies,/Job,/eJob,/jobPosts,/jobManager,/ePost,/home,/positionManager,/edit">
+                        data-match="/companies,/Job,/eJob,/jobPosts,/jobManager,/ePost,/home,/positionManager,/edit,/eform">
                             <button class="proftxt" onclick="location.href='/profile'">
                                 <%= user && user.username ? user.username : 'Guest' %>
                             </button>
@@ -107,7 +107,7 @@
         button.textContent = 'Contracts';
         ab(button);
     } else if (path.includes('jobPosts')) {
-        button.textContent = 'Post Issue';
+        button.textContent = 'Create Contract';
         ab(button);
     } else if (path.includes('/jobManager')) {
         button.textContent = 'Manage Contracts';
@@ -120,6 +120,9 @@
         ab(button);
     } else if (path.includes('/edit')) {
         button.textContent = 'Edit Company';
+        ab(button);
+    } else if (path.includes('/eform')) {
+        button.textContent = 'Apply';
         ab(button);
     }
 

@@ -97,6 +97,7 @@ router.get('/companies', isAuthenticated, async (req, res) => {
 // Delete a company and related data (owner-only or admin)
 router.post('/companies/delete', isAuthenticated, (req, res) => {
     const companyId = req.body.companyId;
+    const referrer = req.get('Referer') || '/companies';
     if (!companyId) return res.status(400).send('Missing company id');
 
     db.get('SELECT * FROM companies WHERE id = ?', [companyId], (err, company) => {
@@ -116,11 +117,11 @@ router.post('/companies/delete', isAuthenticated, (req, res) => {
             db.run('BEGIN TRANSACTION');
 
             // Jobs and their applications/files
-            db.all('SELECT id FROM jobs WHERE company = ?', [company.name], (ej, jobRows) => {
+            db.all('SELECT id FROM jobs WHERE company = ?', [company.name], (jobRows) => {
                 const jobIds = (jobRows || []).map(r => r.id);
                 if (jobIds.length > 0) {
                     const phJobs = jobIds.map(() => '?').join(',');
-                    db.all(`SELECT id FROM job_applications WHERE job_id IN (${phJobs})`, jobIds, (ea, appRows) => {
+                    db.all(`SELECT id FROM job_applications WHERE job_id IN (${phJobs})`, jobIds, (appRows) => {
                         const appIds = (appRows || []).map(r => r.id);
                         if (appIds.length > 0) {
                             const phApps = appIds.map(() => '?').join(',');
@@ -141,13 +142,13 @@ router.post('/companies/delete', isAuthenticated, (req, res) => {
             });
 
             // Positions and their applications/files and tags
-            db.all('SELECT id FROM company_positions WHERE company_id = ?', [company.id], (ep, posRows) => {
+            db.all('SELECT id FROM company_positions WHERE company_id = ?', [company.id], (posRows) => {
                 const posIds = (posRows || []).map(r => r.id);
                 if (posIds.length > 0) {
                     const phPos = posIds.map(() => '?').join(',');
 
                     // delete files for position applications
-                    db.all(`SELECT id FROM position_applications WHERE position_id IN (${phPos})`, posIds, (eap, posAppRows) => {
+                    db.all(`SELECT id FROM position_applications WHERE position_id IN (${phPos})`, posIds, (posAppRows) => {
                         const posAppIds = (posAppRows || []).map(r => r.id);
                         if (posAppIds.length > 0) {
                             const phPosApps = posAppIds.map(() => '?').join(',');
@@ -179,7 +180,7 @@ router.post('/companies/delete', isAuthenticated, (req, res) => {
             });
 
             db.run('COMMIT');
-            return res.redirect('/companies');
+            return res.redirect(referrer);
         });
     });
 });

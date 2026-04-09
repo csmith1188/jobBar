@@ -9,54 +9,58 @@
   <link rel="icon" href="/icons/jobbar.png">
 </head>
 <body class="create-company-page">
-  <nav class="top-controls">
-    <button onclick="location.href='/'">Home</button>
-    <button onclick="location.href='/companies'">Companies</button>
-  </nav>
+  <%- include("banner.ejs") %>
 
   <div class="container">
     <div class="post-card">
       <% const JOB = (typeof job !== 'undefined') ? job : null; const POS = (typeof position !== 'undefined') ? position : null; const COMP = (typeof company !== 'undefined') ? company : null; %>
-      <h1>Apply for: <%= JOB ? JOB.title : (POS ? POS.title : 'Job') %></h1>
-      <% if (COMP) { %>
-        <h3>Company: <%= COMP.name %></h3>
-      <% } %>
+      <h1><%= JOB ? JOB.title : (POS ? POS.title : 'Job') %></h1>
 
       <form id="eform" action="/eform" method="POST" enctype="multipart/form-data">
         <input type="hidden" name="jobId" value="<%= JOB ? JOB.id : '' %>">
         <input type="hidden" name="positionId" value="<%= POS ? POS.id : '' %>">
 
         <div class="form-row">
-          <label for="first_name">First name</label>
+          <label for="first_name">First name:</label>
           <input id="first_name" name="first_name" type="text" required>
         </div>
 
         <div class="form-row">
-          <label for="last_name">Last name</label>
+          <label for="last_name">Last name:</label>
           <input id="last_name" name="last_name" type="text" required>
         </div>
 
         <div class="form-row">
-          <label for="resume">Resume (PDF preferred)</label>
+          <div style="display: flex; align-items: center;">
+            <img src="/icons/png.png" width="20" height="20" style="margin-right:6px; opacity: 0.7;">
+            <label for="resume" class="headt">Resume (PDF):</label>
+          </div>
           <input id="resume" name="resume" type="file" accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
         </div>
 
         <div class="form-row">
-          <label for="portfolio">Portfolio</label>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <div>
-              <strong>Upload PNG images</strong>
+          <div style="display: flex; align-items: center;">
+            <img src="/icons/png.png" width="20" height="20" style="margin-right:6px; opacity: 0.7;">
+            <label for="portfolio" class="headt">Portfolio:</label>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display: flex; justify-content: left; flex-direction: column; gap: 8px;">
+              <label style="display: flex; justify-content: left;">Image (PNG):</label>
               <input id="portfolio_files" name="portfolio" type="file" accept="image/png" multiple>
             </div>
+            <strong style="display: flex; justify-content: left; color: gray">OR</strong>
             <div>
-              <strong>Or provide links to your work (comma-separated)</strong>
-              <input id="portfolio_links" name="portfolio_links" type="text" placeholder="https://example.com, https://behance.net/..." style="width:100%">
+              <label style="display: flex; justify-content: left;">Links to your work (comma-separated):</label>
+              <input id="portfolio_links" name="portfolio_links" type="text" placeholder="https://example.com, https://behance.net/..." style="margin-top: 10px;">
             </div>
           </div>
         </div>
 
         <div class="form-row">
-          <label for="cover_letter">Cover Letter (PDF)</label>
+          <div style="display: flex; align-items: center;">
+            <img src="/icons/png.png" width="20" height="20" style="margin-right:6px; opacity: 0.7;">
+            <label for="cover_letter" class="headt">Cover Letter (PDF):</label>
+          </div>
           <input id="cover_letter" name="cover_letter" type="file" accept="application/pdf">
         </div>
 

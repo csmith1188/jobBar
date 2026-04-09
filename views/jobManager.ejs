@@ -30,7 +30,7 @@
         <div class="jobs-scroll">
           <% if (jobs && jobs.length > 0) { %>
             <% jobs.filter(job => !job.employee_id && !job.has_applications && job.status !== 'completed' && job.status !== 'in_progress').forEach(function(job){ %>
-              <article class="job-card">
+              <article class="job-card available">
                 <div class="job-title"><b><%= job.title %></b></div>
                 <div class="job-desc"><%= job.description %></div>
                 <div class="job-pay" style="display: flex; gap: 5px; align-items: center; justify-content: center;">
@@ -74,7 +74,7 @@
         <div class="jobs-scroll">
           <% if (jobs && jobs.length > 0) { %>
             <% jobs.filter(job => job.has_applications && !job.employee_id && job.status !== 'completed' && job.status !== 'in_progress').forEach(function(job){ %>
-              <article class="job-card">
+              <article class="job-card applied">
                 <div class="job-title"><b><%= job.title %></b></div>
                 <div class="job-desc"><%= job.description %></div>
                 <div class="job-pay" style="display: flex; gap: 5px; align-items: center; justify-content: center;">
@@ -137,7 +137,7 @@
         <div class="jobs-scroll">
           <% if (jobs && jobs.length > 0) { %>
             <% jobs.filter(job => job.employee_id && job.status === 'in_progress').forEach(function(job){ %>
-              <article class="job-card">
+              <article class="job-card ip">
                 <div class="job-title"><b><%= job.title %></b></div>
                 <div class="job-desc"><%= job.description %></div>
                 <div class="job-pay" style="display: flex; gap: 5px; align-items: center; justify-content: center;">
@@ -186,7 +186,7 @@
         <div class="jobs-scroll">
           <% if (jobs && jobs.length > 0) { %>
             <% jobs.filter(job => job.status === 'completed').forEach(function(job){ %>
-              <article class="job-card">
+              <article class="job-card completed">
                 <div class="job-title"><b><%= job.title %></b></div>
                 <div class="job-desc"><%= job.description %></div>
                 <div class="job-pay" style="display: flex; gap: 5px; align-items: center; justify-content: center;">

@@ -36,7 +36,7 @@
         <a class="small-btn" href="/ePost/<%= encodeURIComponent(company.name) %>">+ Add Position</a>
           <button class="small-btn" onclick="location.href='<%= positionManagerUrl %>'">Manage Positions</button>
       <% } %>
-      <input id="job-search-input" type="text" placeholder="Search jobs..." style="margin: 0;"/>
+      <input id="job-search-input" type="text" placeholder="Search positions..." style="margin: 0;"/>
     </div>
 
     <section aria-labelledby="jobs-list">
@@ -46,13 +46,13 @@
       %>
       
       <% if (availableJobs.length === 0) { %>
-        <p>No jobs available for this company.</p>
+        <p>No positions open for this company.</p>
       <% } else { %>
         <div class="jobs-grid">
           <% availableJobs.forEach(function(job){ %>
             <article class="job-card" role="article">
-              <div class="job-title"><b>Job Title:</b> <%= job.title %></div>
-              <div class="job-desc"><b>Description:</b> <%= job.description %></div>
+              <div class="job-title"><%= job.title %></div>
+              <div class="job-desc" style="overflow-x: hidden;"><%= job.description %></div>
               <% if (job.tags && job.tags.length) { %>
                 <div class="job-tags">
                   <% job.tags.forEach(function(tag){ %>

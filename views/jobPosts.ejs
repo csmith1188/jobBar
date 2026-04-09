@@ -18,7 +18,7 @@
             <form id="jobpost-form" action="/jobPosts" method="POST">
                 <input type="hidden" name="company" value="<%= company.name %>">
                 <div class="form-row">
-                    <label for="title">Job Title:</label>
+                    <label for="title">Title:</label>
                     <input type="text" id="title" name="title" maxlength="100" required>
                 </div>
                 <div class="form-row">
@@ -30,12 +30,19 @@
                     <input type="url" id="link" name="link" required>
                 </div>
                 <div class="form-row">
-                    <label for="pay">Pay (minimum 10 DigiPogs):</label>
+                    <label for="pay">Pay:</label>
                     <input type="number" id="pay" name="pay" min="10" required>
                 </div>
+                <div class="inf">
+                    <img src="/icons/info.png" height="15" width="15" style="filter: invert(1)">
+                    <p>Your pay must be greater than or equal to 10 Digipogs</p>
+                </div>
+                <div class="inf">
+                    <img src="/icons/info.png" height="15" width="15" style="filter: invert(1)">
+                    <p>If an employee does a portion of the work, good ettiqette is to still pay them a fair wage</p>
+                </div>
                 <input type="hidden" name="status" value="available">
-                <button type="submit"
-                    style="background-color: <%= company.pColor %>; color: <%= company.bpColor %>; border: 1px solid <%= company.bpColor %>;">Submit</button>
+                <button type="submit">Create Contract</button>
             </form>
 
             <!-- PIN modal -->

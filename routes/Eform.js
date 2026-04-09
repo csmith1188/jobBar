@@ -10,12 +10,21 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage, limits: { fileSize: 20 * 1024 * 1024 } });
 
 // Show the application form for a specific job (query ?jobId=...)
-router.get('/eform', isAuthenticated, (req, res) => {
+router.get('/eform', isAuthenticated, async (req, res) => {
   const db = req.app.locals.db;
   const fb_id = req.session.fb_id;
   const jobId = req.query.jobId;
   const positionId = req.query.positionId;
   if (!fb_id) return res.status(403).send('Forbidden');
+  const fbId = req.session.fb_id;
+    let user = '';
+
+    try {
+        user = await new Promise((resolve, reject) => db.get('SELECT * FROM users WHERE fb_id = ?', [fbId], (e, row) => e ? reject(e) : resolve(row)));
+        if (!user) return res.status(404).send('User not found');
+    } catch (err) {
+        console.log(err);
+    }
 
   if (positionId) {
     // Render application form for a position
@@ -25,7 +34,7 @@ router.get('/eform', isAuthenticated, (req, res) => {
 
       db.get('SELECT * FROM companies WHERE id = ?', [position.company_id], (err2, company) => {
         if (err2) { console.error(err2); return res.status(500).send('Internal Server Error'); }
-        res.render('Eform', { position, company });
+        res.render('Eform', { position, company, user });
       });
     });
     return;

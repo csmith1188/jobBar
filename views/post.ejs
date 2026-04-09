@@ -87,15 +87,14 @@
                     </div>
 
                     <script>
-                        //Get the colorpicker
-                        const colorPicker = document.querySelectorAll('.color-input');
-                        // Add an event listener to listen for change in color
-                        colorPicker.forEach(colorPicker => {
-                            //initial color set
-                            colorPicker.style.setProperty('--color', colorPicker.value);
-                            colorPicker.addEventListener('change', ()=> {
-                                colorPicker.style.setProperty('--color',colorPicker.value)
-                            });
+                        document.querySelectorAll('.color-input').forEach(input => {
+                            const updateColor = () => {
+                                input.style.setProperty('--color', input.value);
+                            };
+                            // set initial color
+                            updateColor();
+                            // update on change
+                            input.addEventListener('input', updateColor);
                         });
                         (function () {
                             const form = document.getElementById('company-form');

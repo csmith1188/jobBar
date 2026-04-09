@@ -34,7 +34,7 @@
         <a class="small-btn" href="<%= jobPostsUrl %>">+ Add Contract</a>
         <button class="small-btn" onclick="location.href='<%= jobManagerUrl %>'">Manage Contracts</button>
       <% } %>
-      <input id="job-search-input" type="text" placeholder="Search jobs..." style="margin: 0;"/>
+      <input id="job-search-input" type="text" placeholder="Search contracts..." style="margin: 0;"/>
     </div>
 
     <section aria-labelledby="jobs-list">
@@ -47,7 +47,7 @@
       %>
       
       <% if (availableJobs.length === 0) { %>
-        <p>No jobs available for this company.</p>
+        <p>No contracts available for this company.</p>
       <% } else { %>
         <div class="jobs-grid">
           <% availableJobs.forEach(function(job){ %>

@@ -184,7 +184,7 @@ input#searchbar{
 
 .company-item .text {
   position: absolute;
-  background-color: rgb(36, 37, 43);
+  background-color: white;
   padding: 5px 8px;
   border-radius: 4px;
   font-size: 0.8em;
@@ -194,7 +194,7 @@ input#searchbar{
   pointer-events: none;
   transition: opacity 0.2s ease;
   right: 30px;
-  color: white;
+  color: black;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.493);
   z-index: 50;
   opacity: 0;

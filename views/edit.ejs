@@ -3,7 +3,7 @@
 <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Edit</title>
+        <title><%= company ? company.name : 'Company' %> | Edit</title>
         <link rel="stylesheet" href="/css/index.css">
         <link rel="stylesheet" href="/css/post.css">
         <style>
@@ -14,9 +14,6 @@
 </head>
 <body
     class="<%= type === 'company' ? 'create-company-page' : (type === 'job' ? 'post-job-page' : '') %>"
-    <% if (type === 'job' && company) { %>
-        style="background: linear-gradient(180deg, <%= company.pColor %>, <%= company.sColor %>); color: <%= company.bpColor %>; --pColor: <%= company.pColor %>; --sColor: <%= company.sColor %>; --bpColor: <%= company.bpColor %>; --bsColor: <%= company.bsColor %>;"
-    <% } %>
 >
     <%- include("banner.ejs") %>
 
@@ -36,16 +33,23 @@
                         <label for="link">Website URL:</label>
                         <input type="url" id="link" name="link" required value="<%= company.link || '' %>">
                     </div>
-                    <div class="color-row">
-                        <label for="pColor">Primary Color:</label>
-                        <input type="color" id="pColor" name="pColor" value="<%= company.pColor || '#000000' %>" class="color-input">
-                        <label for="sColor">Secondary Color:</label>
-                        <input type="color" id="sColor" name="sColor" value="<%= company.sColor || '#ffffff' %>" class="color-input">
+                    <div class="btmr">
+                        <div class="ccont">
+                            <label for="sColor">Colors:</label>
+                            <div class="color-row">
+                                <input type="color" id="pColor" name="pColor"
+                                    value="<%= company && company.pColor ? company.pColor : '#000000' %>" class="color-input">
+                            </div>
+                            <div class="color-row">
+                                <input type="color" id="sColor" name="sColor"
+                                    value="<%= company && company.sColor ? company.sColor : '#ffffff' %>" class="color-input">
+                            </div>
+                        </div>
+                        <input type="hidden" name="owner_id" value="<%= fb_id %>">
+                        <input type="hidden" id="bpColor" name="bpColor" value="<%= company.bpColor || '#ffffff' %>">
+                        <input type="hidden" id="bsColor" name="bsColor" value="<%= company.bsColor || '#000000' %>">
+                        <button type="submit">Submit</button>
                     </div>
-                    <input type="hidden" name="owner_id" value="<%= fb_id %>">
-                    <input type="hidden" id="bpColor" name="bpColor" value="<%= company.bpColor || '#ffffff' %>">
-                    <input type="hidden" id="bsColor" name="bsColor" value="<%= company.bsColor || '#000000' %>">
-                    <button type="submit">Submit</button>
                 </form>
 
             <% } else if (type === 'job' && job) { %>
@@ -67,21 +71,29 @@
                         <label for="pay">Pay:</label>
                         <input type="number" id="pay" name="pay" required value="<%= job.pay %>">
                     </div>
+                    <div class="inf">
+                        <img src="/icons/info.png" height="15" width="15" style="filter: invert(1)">
+                        <p>Your pay must be greater than or equal to 10 Digipogs</p>
+                    </div>
+                    <div class="inf">
+                        <img src="/icons/info.png" height="15" width="15" style="filter: invert(1)">
+                        <p>If an employee does a portion of the work, good ettiqette is to still pay them a fair wage</p>
+                    </div>
                     <input type="hidden" name="status" value="available">
-                    <button type="submit" style="background-color: <%= (company && company.pColor) ? company.pColor : '#333' %>; color: <%= (company && company.bpColor) ? company.bpColor : '#fff' %>; border: 1px solid <%= (company && company.bpColor) ? company.bpColor : '#fff' %>;">Submit</button>
+                    <button type="submit">Submit</button>
                 </form>
             <% } else if (type === 'position' && position) { %>
                 <form id="position-form" action="/edit/position/<%= position.id %>" method="POST">
                     <input type="hidden" name="company" value="<%= company && company.name ? company.name : position.company_name || '' %>">
-                                        <div class="form-row">
-                    <label for="title">Position Title</label>
-                    <input id="title" name="title" type="text" maxlength="120" required value="<%= position.title %>">
-                </div>
+                    <div class="form-row">
+                        <label for="title">Position Title</label>
+                        <input id="title" name="title" type="text" maxlength="120" required value="<%= position.title %>">
+                    </div>
 
-                <div class="form-row">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" maxlength="1000" required><%= position.description || '' %></textarea>
-                </div>
+                    <div class="form-row">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" maxlength="1000" required><%= position.description || '' %></textarea>
+                    </div>
 
                 <div class="form-row">
                     <label>Tags</label>
@@ -161,7 +173,7 @@
                     })();
                 </script>
                     
-                    <button type="submit" style="background-color: <%= (company && company.pColor) ? company.pColor : '#333' %>; color: <%= (company && company.bpColor) ? company.bpColor : '#fff' %>; border: 1px solid <%= (company && company.bpColor) ? company.bpColor : '#fff' %>;">Submit</button>
+                    <button type="submit">Submit</button>
                 </form>
 
             <% } else { %>
@@ -170,4 +182,15 @@
         </div>
     </div>
 </body>
+<script>
+    document.querySelectorAll('.color-input').forEach(input => {
+        const updateColor = () => {
+            input.style.setProperty('--color', input.value);
+        };
+        // set initial color
+        updateColor();
+        // update on change
+        input.addEventListener('input', updateColor);
+    });
+</script>
 </html>

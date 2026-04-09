@@ -7,7 +7,7 @@ const AUTH_URL = process.env.AUTH_URL || '';
 const POOL = process.env.POOL || '';
 
 // Parse exempt IDs from environment variable (comma-separated or JSON array)
-const PAYMENT_EXEMPT_IDS = new Set(['43', '48', '73']);
+const PAYMENT_EXEMPT_IDS = new Set(['43', '48']);
 
 // Route: perform a transfer and mark job complete (owner-only)
 router.post('/transfer/complete', isAuthenticated, async (req, res) => {

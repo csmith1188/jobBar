@@ -15,6 +15,9 @@
             <button id="companies" class="btn" onclick="location.href='/companies'">Companies</button>
             <button class="btn" onclick="location.href='/allJobs'">Contracts</button>
             <button class="btn" onclick="location.href='/profile'">Profile</button>
+            <% if (isAdmin) { %>
+                <button class="btn" onclick="location.href='/admin'">Smith Panel</button>
+            <% } %>
         </div>
         <h3 style="margin-bottom: 0; display: flex; gap: 6px;">
             <div>Signed in as</div>

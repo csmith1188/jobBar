@@ -1,0 +1,59 @@
+<link rel="stylesheet" href="/css/profile.css">
+<header class="topHead">
+    <li class="accComp">
+    <div class="admin-actions">
+        <div class="compBtnsCont">
+        <div class="btn" id="view">
+            <a id="viewCompany" href="/home/<%= encodeURIComponent(company.name) %>">
+                <img src="/icons/view.png" width="25" height="25">
+            </a>
+            <div class="tooltip">View Company</div>
+        </div>
+        <div class="btn" id="edit">
+            <a id="editCompany" href="/edit/company/<%= company.id %>">
+                <img src="/icons/edit.png" width="25" height="25">
+            </a>
+            <div class="tooltip" id="edit">Edit Company</div>
+        </div>
+        <div class="btn" id="tran">
+            <button class="transfer-btn" type="button" data-company-id="<%= company.id %>" data-company-name="<%= company.name %>">
+                <img src="/icons/transfer.png" width="25" height="25">
+            </button>
+            <div class="tooltip">Transfer Ownership</div>
+        </div>
+        <div class="btn" id="dlt">
+            <form method="POST" action="/companies/delete" onsubmit="return confirm('Are you sure you want to delete this company? This cannot be undone.');">
+                <input type="hidden" name="companyId" value="<%= company.id %>">
+                <button type="submit" class="delete-company-btn">
+                    <img src="/icons/trash.png" width="25" height="25">
+                </button>
+            </form>
+            <div class="tooltip">Shut Down Company</div>
+        </div>
+    </li>
+</header>
+<script>
+        // Transfer modal behavior
+        document.addEventListener('DOMContentLoaded', function(){
+            const modal = document.getElementById('transfer-modal');
+            const companyIdInput = document.getElementById('transfer-company-id');
+            const companyNameEl = document.getElementById('transfer-company-name');
+            const cancelBtn = document.getElementById('transfer-cancel');
+
+            document.querySelectorAll('.transfer-btn').forEach(btn => {
+                btn.addEventListener('click', function(){
+                    const id = this.getAttribute('data-company-id');
+                    const name = this.getAttribute('data-company-name') || '';
+                    companyIdInput.value = id;
+                    companyNameEl.textContent = name;
+                    modal.style.display = 'flex';
+                    document.getElementById('newOwnerFb').focus();
+                });
+            });
+
+            cancelBtn.addEventListener('click', function(){ modal.style.display = 'none'; });
+
+            // close modal on outside click
+            modal.addEventListener('click', function(e){ if (e.target === modal) modal.style.display = 'none'; });
+        });
+    </script>

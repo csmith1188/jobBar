@@ -61,6 +61,7 @@ app.use((req, res, next) => {
     const fb = req.session && req.session.fb_id;
     res.locals.fb_id = fb || null;
     res.locals.isManager = fb ? parsedManagers.includes(String(fb)) : false;
+    res.locals.isAdmin = isAdminUser(fb);
     // expose configured payment amounts to views
     res.locals.CPOST = Number(process.env.CPOST || 300);
     res.locals.JPOST = Number(process.env.JPOST || 100);
@@ -126,6 +127,8 @@ const editRouter = require('./routes/edit');
 const eformRouter = require('./routes/Eform');
 const profileRouter = require('./routes/profile');
 const homeRouter = require('./routes/home');
+const adminRouter = require('./routes/admin');
+const { isAdminUser } = require('./middleware/isAdmin');
 
 // Register routes
 app.use('/', editRouter);
@@ -146,6 +149,7 @@ app.use('/', jobRouter);
 app.use('/', payRouter);
 app.use('/', jobManagerRouter);
 app.use('/', positionManagerRouter);
+app.use('/', adminRouter);
 
 
 app.listen(port, () => {

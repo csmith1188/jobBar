@@ -1,6 +1,7 @@
 require('dotenv').config();
 const router = require('express').Router();
 const isAuthenticated = require('../middleware/isAuthenticated');
+const { isAdminUser } = require('../middleware/isAdmin');
 
 router.get('/edit/company/:companyId', isAuthenticated, async (req, res) => {
     const db = req.app.locals.db;
@@ -26,6 +27,9 @@ router.get('/edit/company/:companyId', isAuthenticated, async (req, res) => {
         if (!company) {
             return res.status(404).send('Company not found');
         }
+        if (!isAdminUser(userFb) && String(company.owner_id) !== userFb) {
+            return res.status(403).send('You do not have permission to edit this company');
+        }
         // render shared edit page with company context
         res.render('edit', { type: 'company', company, user });
     });
@@ -42,15 +46,21 @@ router.post('/edit/company/:companyId', isAuthenticated, (req, res) => {
     if (!name || !description || !link || !pColor || !sColor) {
         return res.status(400).send('All fields are required.');
     }
-    const query = `UPDATE companies SET name = ?, description = ?, link = ?, pColor = ?, sColor = ? WHERE id = ? AND owner_id = ? COLLATE NOCASE`;
-    db.run(query, [name, description, link, pColor, sColor, companyId, fb_id], function(err) {
+    const isAdmin = isAdminUser(fb_id);
+    const query = isAdmin
+        ? `UPDATE companies SET name = ?, description = ?, link = ?, pColor = ?, sColor = ? WHERE id = ?`
+        : `UPDATE companies SET name = ?, description = ?, link = ?, pColor = ?, sColor = ? WHERE id = ? AND owner_id = ? COLLATE NOCASE`;
+    const params = isAdmin
+        ? [name, description, link, pColor, sColor, companyId]
+        : [name, description, link, pColor, sColor, companyId, fb_id];
+    db.run(query, params, function(err) {
         if (err) {
             return res.status(500).send('Internal Server Error');
         }
         if (this.changes === 0) {
             return res.status(404).send('Company not found or you do not have permission to edit it.');
         }
-        res.redirect('/jobManager/' + encodeURIComponent(name));
+        res.redirect(isAdmin ? '/admin' : '/jobManager/' + encodeURIComponent(name));
     });
 });
 

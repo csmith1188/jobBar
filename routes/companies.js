@@ -3,6 +3,7 @@ const router = require('express').Router();
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const isAuthenticated = require('../middleware/isAuthenticated');
+const { isAdminUser } = require('../middleware/isAdmin');
 
 // Avoid requiring the app (prevents circular require issues). Open the DB directly.
 const dbFile = path.resolve(__dirname, '../database/database.sqlite');
@@ -97,7 +98,10 @@ router.get('/companies', isAuthenticated, async (req, res) => {
 // Delete a company and related data (owner-only or admin)
 router.post('/companies/delete', isAuthenticated, (req, res) => {
     const companyId = req.body.companyId;
-    const referrer = req.get('Referer') || '/companies';
+    const requestedReturn = req.body.returnTo;
+    const referrer = requestedReturn && /^\/(?!\/)/.test(requestedReturn)
+        ? requestedReturn
+        : (req.get('Referer') || '/companies');
     if (!companyId) return res.status(400).send('Missing company id');
 
     db.get('SELECT * FROM companies WHERE id = ?', [companyId], (err, company) => {
@@ -107,8 +111,7 @@ router.post('/companies/delete', isAuthenticated, (req, res) => {
         const ownerFb = company.owner_id != null ? String(company.owner_id) : null;
         const userFb = req.session && req.session.fb_id ? String(req.session.fb_id) : null;
 
-        // allow admin (fb '1') or company owner
-        if (userFb !== '1' && ownerFb !== userFb) {
+        if (!isAdminUser(userFb) && ownerFb !== userFb) {
             return res.status(403).send('You do not have permission to delete this company');
         }
 
@@ -198,14 +201,22 @@ router.post('/companies/transfer-owner', isAuthenticated, (req, res) => {
         const ownerFb = company.owner_id != null ? String(company.owner_id) : null;
         const userFb = req.session && req.session.fb_id ? String(req.session.fb_id) : null;
 
-        // Only admin (fb '1') or current owner may transfer
-        if (userFb !== '1' && ownerFb !== userFb) {
+        if (!isAdminUser(userFb) && ownerFb !== userFb) {
             return res.status(403).send('You do not have permission to transfer this company');
         }
 
-        db.run('UPDATE companies SET owner_id = ? WHERE id = ?', [newOwnerFb, companyId], function(uErr) {
-            if (uErr) { console.error('Error transferring ownership', uErr); return res.status(500).send('Internal Server Error'); }
-            return res.redirect('/profile');
+        db.get('SELECT fb_id FROM users WHERE fb_id = ?', [newOwnerFb], (ownerErr, newOwner) => {
+            if (ownerErr) { console.error('Error validating new owner', ownerErr); return res.status(500).send('Internal Server Error'); }
+            if (!newOwner) return res.status(400).send('The new owner must be an existing user');
+
+            db.run('UPDATE companies SET owner_id = ? WHERE id = ?', [newOwnerFb, companyId], function(uErr) {
+                if (uErr) { console.error('Error transferring ownership', uErr); return res.status(500).send('Internal Server Error'); }
+                const requestedReturn = req.body.returnTo;
+                const returnTo = requestedReturn && /^\/(?!\/)/.test(requestedReturn)
+                    ? requestedReturn
+                    : '/profile';
+                return res.redirect(returnTo);
+            });
         });
     });
 });

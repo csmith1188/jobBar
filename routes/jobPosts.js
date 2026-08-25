@@ -26,7 +26,9 @@ router.get('/jobPosts/:companyName', isAuthenticated, async (req, res) => {
         }
 
         // Check if user is the owner
-        if (company.owner_id !== req.session.fb_id) {
+        const isCompanyOwner = String(company.owner_id) === String(req.session.fb_id);
+        const isConfiguredManager = Boolean(res.locals && res.locals.isManager);
+        if (!isCompanyOwner && !isConfiguredManager) {
             return res.status(403).send('You do not have permission to post jobs for this company');
         }
 
@@ -44,11 +46,6 @@ router.get('/jobPosts/:companyName', isAuthenticated, async (req, res) => {
 router.post('/jobPosts', isAuthenticated, async (req, res) => {
     const db = req.app.locals.db;
     const body = req.body || {};
-
-    // Manager check
-    if (!res.locals || !res.locals.isManager) {
-        return res.status(403).json({ success: false, message: 'Forbidden: not a manager' });
-    }
 
     const { company, title, description, link, pay, status, paymentVerified } = body;
 
@@ -91,8 +88,10 @@ router.post('/jobPosts', isAuthenticated, async (req, res) => {
             return res.status(403).json({ success: false, message: 'No owner ID in session' });
         }
 
-        if (companyRow.owner_id !== ownerId) {
-            return res.status(403).json({ success: false, message: 'You do not own this company' });
+        const isCompanyOwner = String(companyRow.owner_id) === String(ownerId);
+        const isConfiguredManager = Boolean(res.locals && res.locals.isManager);
+        if (!isCompanyOwner && !isConfiguredManager) {
+            return res.status(403).json({ success: false, message: 'You do not own this company or have manager access' });
         }
 
         // Insert job into database

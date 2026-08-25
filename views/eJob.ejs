@@ -28,12 +28,15 @@
       const ownerId = company && (company.owner_id !== undefined && company.owner_id !== null) ? String(company.owner_id) : null;
       const requesterId = typeof fb_id !== 'undefined' && fb_id !== null ? String(fb_id) : null;
       const canManage = requesterId && ownerId && requesterId === ownerId;
+      const canCreate = canManage || Boolean(typeof isManager !== 'undefined' && isManager);
         const jobPostsUrl = company ? ('/jobPosts/' + encodeURIComponent(company.name)) : '/jobPosts/Not%20found';
         const positionManagerUrl = company ? ('/positionManager/' + encodeURIComponent(company.name)) : '/positionManager/Not%20found';
     %>
     <div class="nav-row">
-      <% if (canManage) { %>
+      <% if (canCreate) { %>
         <a class="small-btn" href="/ePost/<%= encodeURIComponent(company.name) %>">+ Add Position</a>
+      <% } %>
+      <% if (canManage) { %>
           <button class="small-btn" onclick="location.href='<%= positionManagerUrl %>'">Manage Applications</button>
       <% } %>
       <input id="job-search-input" type="text" placeholder="Search positions..." style="margin: 0;"/>

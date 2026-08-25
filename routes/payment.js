@@ -158,7 +158,8 @@ router.post('/transfer/job', isAuthenticated, async (req, res) => {
 		if (!companyRow) return res.status(404).json({ success: false, message: 'Company not found' });
 
 		const ownerFb = companyRow.owner_id !== undefined && companyRow.owner_id !== null ? String(companyRow.owner_id) : null;
-		if (payer !== ownerFb && payer !== '1') return res.status(403).json({ success: false, message: 'Forbidden: only company owner may post jobs with payment' });
+		const isConfiguredManager = Boolean(res.locals && res.locals.isManager);
+		if (payer !== ownerFb && payer !== '1' && !isConfiguredManager) return res.status(403).json({ success: false, message: 'Forbidden: only the company owner or a configured manager may post jobs' });
 
 		// If payer is exempt, skip transfer and return success
 		if (PAYMENT_EXEMPT_IDS.has(payer)) {
@@ -236,7 +237,8 @@ router.post('/transfer/position', isAuthenticated, async (req, res) => {
         if (!companyRow) return res.status(404).json({ success: false, message: 'Company not found' });
 
         const ownerFb = companyRow.owner_id !== undefined && companyRow.owner_id !== null ? String(companyRow.owner_id) : null;
-        if (payer !== ownerFb && payer !== '1') return res.status(403).json({ success: false, message: 'Forbidden: only company owner may create positions with payment' });
+		const isConfiguredManager = Boolean(res.locals && res.locals.isManager);
+		if (payer !== ownerFb && payer !== '1' && !isConfiguredManager) return res.status(403).json({ success: false, message: 'Forbidden: only the company owner or a configured manager may create positions' });
 
         // Perform transfer from payer -> pool
         const authUrl = AUTH_URL.replace(/\/$/, '');

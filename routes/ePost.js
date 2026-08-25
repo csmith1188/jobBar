@@ -24,7 +24,8 @@ router.get('/ePost/:companyName', isAuthenticated, async (req, res) => {
 
     const requesterFb = req.session && req.session.fb_id ? String(req.session.fb_id) : null;
     const ownerFb = companyRow.owner_id !== undefined && companyRow.owner_id !== null ? String(companyRow.owner_id) : null;
-    if (!requesterFb || requesterFb !== ownerFb) return res.redirect('/companies');
+    const isConfiguredManager = Boolean(res.locals && res.locals.isManager);
+    if (!requesterFb || (requesterFb !== ownerFb && !isConfiguredManager)) return res.redirect('/companies');
 
     res.render('ePost', { company: companyRow, user });
   });
@@ -41,11 +42,6 @@ router.post('/ePost', isAuthenticated, async (req, res) => {
       if (!user) return res.status(404).send('User not found');
   } catch (err) {
       console.log(err);
-  }
-
-  // Manager check
-  if (!res.locals || !res.locals.isManager) {
-    return res.status(403).json({ success: false, message: 'Forbidden: not a manager' });
   }
 
   const { company, title, description, tags, paymentVerified } = body;
@@ -84,8 +80,10 @@ router.post('/ePost', isAuthenticated, async (req, res) => {
     }
 
     const ownerFb = companyRow.owner_id !== undefined && companyRow.owner_id !== null ? String(companyRow.owner_id) : null;
-    if (String(ownerId) !== ownerFb) {
-      return res.status(403).json({ success: false, message: 'You do not own this company' });
+    const isCompanyOwner = String(ownerId) === ownerFb;
+    const isConfiguredManager = Boolean(res.locals && res.locals.isManager);
+    if (!isCompanyOwner && !isConfiguredManager) {
+      return res.status(403).json({ success: false, message: 'You do not own this company or have manager access' });
     }
 
     const companyId = companyRow.id;

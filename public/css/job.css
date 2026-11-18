@@ -148,7 +148,10 @@ input#job-search-input{
 .job-desc {
     height: 100px;
     overflow-y: auto;
-    margin: 15px 0 1rem
+    margin: 15px 0 1rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    tab-size: 4;
 }
 
 .job-desc::-webkit-scrollbar {

@@ -65,6 +65,7 @@ app.use((req, res, next) => {
     // expose configured payment amounts to views
     res.locals.CPOST = Number(process.env.CPOST || 300);
     res.locals.JPOST = Number(process.env.JPOST || 100);
+    res.locals.EPOST = Number(process.env.EPOST || 5);
     next();
 });
 // expose helpers to check company ownership/permission

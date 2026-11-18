@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS users (
     fb_id TEXT UNIQUE,
     username TEXT,
     pin TEXT,
-    money INTEGER DEFAULT 0
+    money INTEGER DEFAULT 0,
+    is_manager INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS jobs (

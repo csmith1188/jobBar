@@ -18,6 +18,8 @@
         .admin-filter select { min-width: 140px; }
         .admin-filter input { flex: 1; min-width: 0; }
         .empty { text-align: center; padding: 24px; }
+        .manager-section { max-width: 1100px; margin: 0 auto 28px; }
+        .manager-section h2 { margin: 0 0 10px; }
         @media (max-width: 700px) { .admin-page { padding: 20px 10px; } .admin-table th, .admin-table td { padding: 8px; } .admin-filter { flex-direction: column; } }
     </style>
 </head>
@@ -25,6 +27,34 @@
     <%- include("banner.ejs") %>
     <main class="admin-page">
         <h1>Smith Panel</h1>
+        <div class="manager-section">
+            <h2>Managers</h2>
+            <div class="admin-table-wrap" style="margin:0;">
+                <table class="admin-table">
+                    <thead><tr><th>User</th><th>Formbar ID</th><th>Manager Status</th></tr></thead>
+                    <tbody>
+                        <% users.forEach(managedUser => { %>
+                            <tr>
+                                <td><%= managedUser.username || 'Guest' %></td>
+                                <td><%= managedUser.fb_id %></td>
+                                <td>
+                                    <form action="/admin/users/manager" method="POST" style="display:inline;">
+                                        <input type="hidden" name="fbId" value="<%= managedUser.fb_id %>">
+                                        <input type="hidden" name="isManager" value="<%= managedUser.is_manager ? 'false' : 'true' %>">
+                                        <button type="submit" style="padding:8px 12px; border:none; border-radius:12px; cursor:pointer; background:<%= managedUser.is_manager ? '#a44' : '#2a7' %>; color:#fff;">
+                                            <%= managedUser.is_manager ? 'Remove Manager' : 'Make Manager' %>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                        <% if (!users.length) { %>
+                            <tr><td class="empty" colspan="3">No users found.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <div class="admin-filter">
             <select id="admin-filter-field" aria-label="Filter field">
                 <option value="owner-id">ID</option>

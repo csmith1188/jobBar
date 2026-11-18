@@ -20,7 +20,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "init-database": "node scripts/initDatabase.js"
+    "init-database": "node scripts/initDatabase.js",
+    "migrate:manager-status": "node scripts/migrateManagerStatus.js"
   },
   "author": "",
   "license": "ISC"

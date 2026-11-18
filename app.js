@@ -36,38 +36,29 @@ app.use(session({
     saveUninitialized: false
 }));
 
-// Parse managers from environment
-const rawManagers = process.env.managers || process.env.MANAGERS || '';
-let parsedManagers = [];
-try {
-    const s = String(rawManagers).trim();
-    if (!s) parsedManagers = [];
-    else if (s.startsWith('[') && s.endsWith(']')) {
-        // try JSON parse
-        parsedManagers = JSON.parse(s).map(String);
-    } else if (s.indexOf(',') !== -1) {
-        parsedManagers = s.split(',').map(x => x.trim()).filter(Boolean).map(String);
-    } else {
-        parsedManagers = [s.replace(/\s+/g, '')].filter(Boolean).map(String);
-    }
-} catch (err) {
-    // fallback: try to extract numbers
-    parsedManagers = (String(rawManagers).match(/\d+/g) || []).map(String);
-}
-
-// expose manager list and current user's fb_id/isManager to all views
+// expose the current user's database manager status to all views and routes
 app.use((req, res, next) => {
-    res.locals.managers = parsedManagers;
     const fb = req.session && req.session.fb_id;
     res.locals.fb_id = fb || null;
-    res.locals.isManager = fb ? parsedManagers.includes(String(fb)) : false;
     res.locals.isAdmin = isAdminUser(fb);
-    // expose configured payment amounts to views
-    res.locals.CPOST = Number(process.env.CPOST || 300);
-    res.locals.JPOST = Number(process.env.JPOST || 100);
-    res.locals.EPOST = Number(process.env.EPOST || 5);
-    next();
+
+    if (!fb) {
+        res.locals.isManager = false;
+        res.locals.CPOST = Number(process.env.CPOST || 300);
+        res.locals.JPOST = Number(process.env.JPOST || 100);
+        res.locals.EPOST = Number(process.env.EPOST || 5);
+        return next();
+    }
+
+    db.get('SELECT is_manager FROM users WHERE fb_id = ?', [fb], (err, user) => {
+        res.locals.isManager = !err && Boolean(user && Number(user.is_manager));
+        res.locals.CPOST = Number(process.env.CPOST || 300);
+        res.locals.JPOST = Number(process.env.JPOST || 100);
+        res.locals.EPOST = Number(process.env.EPOST || 5);
+        next();
+    });
 });
+
 // expose helpers to check company ownership/permission
 app.use((req, res, next) => {
     const fb = req.session && req.session.fb_id ? String(req.session.fb_id) : null;

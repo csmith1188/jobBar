@@ -114,6 +114,9 @@ input#searchbar{
 
 .company-item .desc p {
   margin-right: 5px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 4;
 }
 
 .company-item .desc {

@@ -89,7 +89,14 @@ input[type="text"], input[type="url"], input[type="number"], textarea{
   max-width:640px; /* make text boxes a bit wider to match post.ejs sizing */
   margin:0 auto; /* center inputs within constrained form */
 }
-textarea{min-height:120px;resize:vertical;max-width:640px}
+textarea{
+  min-height:120px;
+  resize:vertical;
+  max-width:640px;
+  white-space:pre-wrap;
+  tab-size:4;
+  line-height:1.45;
+}
 
 button[type="submit"]{
     display: flex;

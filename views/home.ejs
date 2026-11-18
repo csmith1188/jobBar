@@ -27,7 +27,7 @@
                         <strong style="font-size: 15px;"><%= owner ? (owner.username || owner.fb_id) : 'Unknown' %></strong>
                     </div>
                 </div>
-                <p style="margin:0 0 0.6rem 0;"><%= company && company.description ? company.description : 'No description provided.' %></p>
+                <p style="margin:0 0 0.6rem 0; white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 4;"><%= company && company.description ? company.description : 'No description provided.' %></p>
 
                 <div style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;">
                     <div class="employees">
